@@ -1,20 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator, StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from './src/screens/ScreenParams';
+import { HomeScreen } from './src/screens/HomeScreen';
+import { MeditateScreen } from './src/screens/MeditateScreen';
+import { LogScreen } from './src/screens/LogScreen';
+
+const RootStack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <RootStack.Navigator initialRouteName='Home'>
+        <RootStack.Screen name='Home' component={HomeScreen} />
+        <RootStack.Screen name='Meditate' component={MeditateScreen} />
+        <RootStack.Screen name='Log' component={LogScreen} />
+      </RootStack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
