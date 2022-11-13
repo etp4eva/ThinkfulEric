@@ -10,7 +10,7 @@ type LogAction =
     }
     | {
         type: Types.UPDATE_MEDITATION;
-        payload: {key: string, log: string}
+        payload: Meditation
     }
 
 export const actionCreators = {
@@ -19,9 +19,9 @@ export const actionCreators = {
         payload: createMeditation(timestamp, log) 
     }),
 
-    updateMeditation: (key: string, log: string) => ({ 
+    updateMeditation: (meditation: Meditation) => ({ 
         type: Types.UPDATE_MEDITATION, 
-        payload: {key, log}
+        payload: meditation
     })
 }
 
@@ -85,7 +85,7 @@ export function MeditationReducer(state: State, action: LogAction) {
 
         case Types.UPDATE_MEDITATION:
             newState = {...state};
-            state.meditations[action.payload.key].log = action.payload.log;
+            newState.meditations[action.payload.key] = action.payload;
             return newState
     }
 }

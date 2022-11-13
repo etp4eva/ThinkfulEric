@@ -1,4 +1,3 @@
-import { usePreventRemoveContext } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack"
 import { useContext } from "react";
 import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight } from "react-native";
@@ -46,6 +45,7 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
   const {state, dispatch} = useContext(DispatchContext);
   const markedDate = generateMeditationList(state.meditations);
 
+  // TODO: Filter meditation list by month displayed
   const renderItem: ListRenderItem<string> = ({item}) => {
     const meditation: Meditation = state.meditations[item];
     return (
