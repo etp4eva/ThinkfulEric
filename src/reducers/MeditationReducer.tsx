@@ -1,6 +1,8 @@
 enum Types {
   ADD_MEDITATION = 'ADD_MEDITATION',
   UPDATE_MEDITATION = 'UPDATE_MEDITATION',
+  ADD_CHIME = 'ADD_CHIME',
+  REMOVE_CHIME = 'REMOVE_CHIME',
 }
 
 type LogAction = 
@@ -10,7 +12,15 @@ type LogAction =
     }
     | {
         type: Types.UPDATE_MEDITATION;
-        payload: Meditation
+        payload: Meditation;
+    }
+    | {
+        type: Types.ADD_CHIME;
+        payload: Chime;
+    }
+    | {
+        type: Types.REMOVE_CHIME;
+        payload: number;
     }
 
 export const actionCreators = {
@@ -22,6 +32,16 @@ export const actionCreators = {
     updateMeditation: (meditation: Meditation) => ({ 
         type: Types.UPDATE_MEDITATION, 
         payload: meditation
+    }),
+
+    addChime: (chime: Chime) => ({
+        type: Types.ADD_CHIME,
+        payload: chime
+    }),
+
+    removeChime: (numMinutes: number) => ({
+        type: Types.REMOVE_CHIME,
+        payload: numMinutes
     })
 }
 
@@ -31,6 +51,11 @@ export type Meditation = {
     month: number;
     markString: string;
     log: string;
+}
+
+interface Chime {
+    label: string;
+    numMinutes: number;
 }
 
 const getFormattedDateString = (d: Date): string => {
@@ -59,6 +84,7 @@ export interface MeditationMap {
 
 export type State = {
     meditations: MeditationMap;
+    chimes: Chime[];
 }
 
 const dummyMeditations: Meditation[] = [
@@ -73,10 +99,19 @@ export const MeditationInitialState: State = {
         [dummyMeditations[1].key]: dummyMeditations[1],
         [dummyMeditations[2].key]: dummyMeditations[2],
     },
+    chimes: [
+        { label: '20 minutes', numMinutes: 20 },
+    ]
 }
 
-export function MeditationReducer(state: State, action: LogAction) {
-    let newState: State = {meditations:{}}
+const EmptyState: State = {
+    meditations: {},
+    chimes: []
+}
+
+export const MeditationReducer = (state: State, action: LogAction) => {
+    let newState: State = EmptyState;
+
     switch (action.type) {
         case Types.ADD_MEDITATION:
             newState = {...state};
@@ -87,5 +122,20 @@ export function MeditationReducer(state: State, action: LogAction) {
             newState = {...state};
             newState.meditations[action.payload.key] = action.payload;
             return newState
+
+        case Types.ADD_CHIME:
+            newState = {...state};
+            newState.chimes.push(action.payload);
+            newState.chimes.sort((a,b) => a.numMinutes - b.numMinutes);
+            return newState;
+        
+        case Types.REMOVE_CHIME:            
+            newState = {
+                ...state, 
+                chimes: state.chimes.filter(
+                    (val, idx) => idx !== action.payload
+                )
+            };
+            return newState;
     }
 }
