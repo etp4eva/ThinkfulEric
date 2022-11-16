@@ -6,12 +6,14 @@ import { Text } from "react-native"
 export enum CountDownState {
     RUNNING = 'RUNNING',
     PAUSED = 'PAUSED',
+    COMPLETE = 'COMPLETE',
 }
 
 type Props = {
     totalMinutes: number;
     totalSeconds: number;
     state: CountDownState;
+    onComplete?: () => void;
 };
 
 const generateDisplayString = (minutes: number, seconds: number) => {
@@ -36,10 +38,14 @@ export const CountDown = (props: Props) => {
     const elapsedMilliseconds = useState(0);
     const lastTime = useState(Date.now());
     const [state, setState] = useState(props.state);
-
-    const totalMs = calculateMs(props.totalMinutes, props.totalSeconds);
+    const [totalMs, setTotal] = useState(calculateMs(props.totalMinutes, props.totalSeconds));
 
     const updateTime = () => {
+        if (state === CountDownState.COMPLETE && props.onComplete) {
+            props.onComplete();
+            setState(CountDownState.PAUSED);
+        }
+
         if (state === CountDownState.RUNNING)
         {
             const interval = Date.now() - lastTime[0];
@@ -50,7 +56,7 @@ export const CountDown = (props: Props) => {
             if (msRemaining <= 0)
             {
                 msRemaining = 0;
-                setState(CountDownState.PAUSED);
+                setState(CountDownState.COMPLETE);              
             }
 
             let minSec = calculateMinSec(msRemaining);
@@ -66,6 +72,11 @@ export const CountDown = (props: Props) => {
 
         return () => clearInterval(interval);
     });
+
+    useEffect(() => {
+        setTotal(calculateMs(props.totalMinutes, props.totalSeconds));
+        setState(props.state);
+    }, [props])
 
     return <Text>{timerDisplay}</Text>
 

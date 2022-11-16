@@ -1,8 +1,10 @@
-import { Meditation } from "./LogScreen";
+import { Chime } from "../reducers/MeditationReducer";
 
 export type RootStackParamList = {
     'Home': undefined;
-    'Meditate': undefined;
+    'Meditate': {
+      chimeList: Chime[]
+    };
     'Log': undefined;
     'MeditationInfo': {
       meditationKey: string

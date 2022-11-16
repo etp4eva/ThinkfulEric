@@ -53,7 +53,7 @@ export type Meditation = {
     log: string;
 }
 
-interface Chime {
+export interface Chime {
     label: string;
     numMinutes: number;
 }

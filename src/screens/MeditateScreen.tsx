@@ -1,6 +1,8 @@
 import { StackScreenProps } from "@react-navigation/stack"
-import { View, Text, StyleSheet } from "react-native";
+import { useState } from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { CountDown, CountDownState } from "../components/CountDown";
+import { Chime } from "../reducers/MeditationReducer";
 import { RootStackParamList } from "./ScreenParams";
 
 enum MeditationMode {
@@ -11,14 +13,54 @@ enum MeditationMode {
 }
 
 export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Meditate'> ) => {
+  const [chimeList, setChimeList] = useState<Chime[]>(route.params.chimeList);
+  const [nextChime, setNextChime] = useState<Chime>(chimeList[0]);
+  const [lastChime, setLastChime] = useState<Chime>(chimeList[chimeList.length - 1]);
+  const [timerState, setTimerState] = useState<CountDownState>(CountDownState.RUNNING);
+  const [nextChimeTime, setNextChimeTime] = useState(nextChime.numMinutes);
+
+  let nextChimeCounter;
+  if (chimeList.length > 1)
+  {
+    nextChimeCounter = (
+      <View>
+        <Text>Time until next chime:</Text>
+        <CountDown 
+          totalMinutes={nextChimeTime}
+          totalSeconds={0}
+          state={timerState}
+          onComplete={() => {
+            if (chimeList.length > 1) {
+              setNextChime(chimeList[1]);
+              setNextChimeTime(chimeList[1].numMinutes);
+              setTimerState(CountDownState.RUNNING);
+            }
+            setChimeList(
+              chimeList.filter((value, index) => {return index !== 0})
+            );            
+          }}
+        />
+      </View>
+    )
+  }
   
   return (
     <View style={styles.container}>
       <Text>A countdown clock with total time and time to next chime</Text>
+      <Text>Total time left:</Text>
       <CountDown 
-        totalMinutes={10}
-        totalSeconds={30}
-        state={CountDownState.RUNNING}
+        totalMinutes={lastChime.numMinutes}
+        totalSeconds={0}
+        state={timerState}
+      />
+      {nextChimeCounter}
+      <FlatList 
+        data={chimeList}
+        renderItem={({item}) => {
+          return (
+            <Text>{item.label}</Text>
+          )
+        }}
       />
     </View>
   )

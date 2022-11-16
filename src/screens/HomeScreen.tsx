@@ -33,7 +33,7 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
         <Text>Dial in your meditation settings here. When should chimes occur</Text>
         <Button 
           title='Start Meditation'
-          onPress={ () => navigation.navigate('Meditate')}
+          onPress={ () => navigation.navigate('Meditate', {chimeList: state.chimes})}
         />
         <Button 
           title='View log'
