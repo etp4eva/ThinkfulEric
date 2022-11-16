@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { FlatList } from "react-native-gesture-handler";
-import { DispatchContext } from "../contexts/context";
+import { DispatchContext } from "../contexts/Context";
 import { Meditation, MeditationMap } from "../reducers/MeditationReducer";
 import { RootStackParamList } from "./ScreenParams";
 

@@ -2,7 +2,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from './ScreenParams';
 import { Button, Text, View, StyleSheet, TextInput } from 'react-native'
 import { useContext, useState } from 'react';
-import { DispatchContext } from '../contexts/context';
+import { DispatchContext } from '../contexts/Context';
 import { Meditation } from './LogScreen';
 import { actionCreators } from '../reducers/MeditationReducer';
 
