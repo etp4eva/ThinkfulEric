@@ -1,48 +1,34 @@
 import { StackScreenProps } from "@react-navigation/stack"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Button, View, Text, StyleSheet, Modal, Dimensions } from "react-native";
-import { RemovableListItemInterface, RemoveableItemList } from "../components/RemovableItemList";
+import { RemoveableItemList } from "../components/RemovableItemList";
 import { TimePickerModal } from "../components/TimePickerModal";
+import { DispatchContext } from "../contexts/Context";
+import { actionCreators } from "../reducers/MeditationReducer";
 import { RootStackParamList } from "./ScreenParams";
 
-interface Chime extends RemovableListItemInterface {
-  numMinutes: number;
+const createChime = (numMinutes: number) => {
+  return {
+    numMinutes: numMinutes,
+    label: (numMinutes === 1 ? `${numMinutes} minute` : `${numMinutes} minutes`),
+  }
 }
 
 export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Home'> ) => {
-    const [chimeTimes, setChimes] = useState<Chime[]>([]);
+    const {state, dispatch} = useContext(DispatchContext);
     const [timePickerModalOpen, setTimePickerModalOpen] = useState<boolean>(false);
-
-    const removeChime = (index: number) => {
-
-      let newList: Chime[] = chimeTimes.filter((value, ind) => {        
-        return ind !== index;
-      })
-
-      setChimes(newList)
-    }
-
-    const addChimeTime = (numMinutes: number) => {
-      const chime: Chime = {
-        numMinutes: numMinutes,
-        label: (numMinutes === 1 ? `${numMinutes} minute` : `${numMinutes} minutes`),
-        removeFn: function (): void {
-          throw new Error("Function not implemented.");
-        }
-      }
-        
-      let newList: Chime[] = [...chimeTimes, chime]
-      newList.sort((a,b) => a.numMinutes - b.numMinutes)
-      setChimes(newList)
-    }
-    
+  
     return (
       <View style={styles.container}>
         <TimePickerModal 
           initialNumber={1}
           visible={timePickerModalOpen}
           closeModalFn={() => setTimePickerModalOpen(!timePickerModalOpen)}
-          handleNumberFn={(num) => { addChimeTime(num) }}
+          handleNumberFn={(num) => { 
+            dispatch(actionCreators.addChime(
+              createChime(num)
+            )) 
+          }}
         />
         <Text>Dial in your meditation settings here. When should chimes occur</Text>
         <Button 
@@ -57,7 +43,13 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
           title='Add chime'
           onPress={ () => setTimePickerModalOpen(true) }
         />
-        <RemoveableItemList data={chimeTimes} removeFn={removeChime} />
+        <RemoveableItemList 
+          data={state.chimes}
+          removeFn={(idx: number) => {
+            dispatch(actionCreators.removeChime(idx))
+          }}
+          minItems={1}
+        />
       </View>
     )
 }
