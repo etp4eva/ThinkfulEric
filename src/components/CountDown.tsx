@@ -35,16 +35,23 @@ export const CountDown = (props: Props) => {
     );
     const elapsedMilliseconds = useState(0);
     const lastTime = useState(Date.now());
+    const [state, setState] = useState(props.state);
 
     const totalMs = calculateMs(props.totalMinutes, props.totalSeconds);
 
     const updateTime = () => {
-        if (props.state === CountDownState.RUNNING)
+        if (state === CountDownState.RUNNING)
         {
             const interval = Date.now() - lastTime[0];
             elapsedMilliseconds[0] = elapsedMilliseconds[0] + interval;
 
             let msRemaining = totalMs - elapsedMilliseconds[0];
+
+            if (msRemaining <= 0)
+            {
+                msRemaining = 0;
+                setState(CountDownState.PAUSED);
+            }
 
             let minSec = calculateMinSec(msRemaining);
 
