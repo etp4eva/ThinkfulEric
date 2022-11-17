@@ -1,18 +1,12 @@
 import { StackScreenProps } from "@react-navigation/stack"
 import { useContext, useState } from "react"
-import { Button, View, Text, StyleSheet, Modal, Dimensions } from "react-native";
+import { Button, View, Text, StyleSheet } from "react-native";
 import { RemoveableItemList } from "../components/RemovableItemList";
-import { TimePickerModal } from "../components/TimePickerModal";
+import { TimePickerModal } from "../components/ChimePickerModal";
 import { DispatchContext } from "../contexts/Context";
 import { actionCreators } from "../reducers/MeditationReducer";
+import { createChime } from "../utils/types";
 import { RootStackParamList } from "./ScreenParams";
-
-const createChime = (numMinutes: number) => {
-  return {
-    numMinutes: numMinutes,
-    label: (numMinutes === 1 ? `${numMinutes} minute` : `${numMinutes} minutes`),
-  }
-}
 
 export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Home'> ) => {
     const {state, dispatch} = useContext(DispatchContext);
@@ -24,10 +18,8 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
           initialNumber={1}
           visible={timePickerModalOpen}
           closeModalFn={() => setTimePickerModalOpen(!timePickerModalOpen)}
-          handleNumberFn={(num) => { 
-            dispatch(actionCreators.addChime(
-              createChime(num)
-            )) 
+          handleChimeFn={(chime) => { 
+            dispatch(actionCreators.addChime(chime)) 
           }}
         />
         <Text>Dial in your meditation settings here. When should chimes occur</Text>
