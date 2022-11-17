@@ -1,4 +1,4 @@
-import { Chime } from "../reducers/MeditationReducer";
+import { Chime } from "../utils/types";
 
 export type RootStackParamList = {
     'Home': undefined;
