@@ -6,7 +6,11 @@ import { Text } from "react-native"
 export enum CountDownState {
     RUNNING = 'RUNNING',
     PAUSED = 'PAUSED',
+}
+
+enum InternalState {
     COMPLETE = 'COMPLETE',
+    ON_COMPLETE_FIRED = 'ON_COMPLETE_FIRED',
 }
 
 type Props = {
@@ -37,13 +41,13 @@ export const CountDown = (props: Props) => {
     );
     const elapsedMilliseconds = useState(0);
     const lastTime = useState(Date.now());
-    const [state, setState] = useState(props.state);
+    const [state, setState] = useState<CountDownState | InternalState>(props.state);
     const [totalMs, setTotal] = useState(calculateMs(props.totalMinutes, props.totalSeconds));
 
     const updateTime = () => {
-        if (state === CountDownState.COMPLETE && props.onComplete) {
+        if (state === InternalState.COMPLETE && props.onComplete) {
             props.onComplete();
-            setState(CountDownState.PAUSED);
+            setState(InternalState.ON_COMPLETE_FIRED);
         }
 
         if (state === CountDownState.RUNNING)
@@ -56,7 +60,7 @@ export const CountDown = (props: Props) => {
             if (msRemaining <= 0)
             {
                 msRemaining = 0;
-                setState(CountDownState.COMPLETE);              
+                setState(InternalState.COMPLETE);              
             }
 
             let minSec = calculateMinSec(msRemaining);
