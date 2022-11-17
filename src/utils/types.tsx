@@ -1,3 +1,5 @@
+import { AVPlaybackSource } from "expo-av/build/AV.types";
+
 export type Meditation = {
     key: string;
     timestamp: Date;
@@ -14,14 +16,14 @@ export enum BuiltInChimeSounds {
 type BuiltInChimesDataT = {[key in BuiltInChimeSounds]: ChimeData};
 
 export const BuiltInChimesData: BuiltInChimesDataT = {
-    [BuiltInChimeSounds.CHIME1]: {key: BuiltInChimeSounds.CHIME1, label: 'Bowl Chime', path: './assets/chime1.mp3'},
-    [BuiltInChimeSounds.WAVES1]: {key: BuiltInChimeSounds.WAVES1, label: 'Waves', path: './assets/waves1.mp3'},
+    [BuiltInChimeSounds.CHIME1]: {key: BuiltInChimeSounds.CHIME1, label: 'Bowl Chime', soundSource: require('../../assets/chimes/chime1.mp3')},
+    [BuiltInChimeSounds.WAVES1]: {key: BuiltInChimeSounds.WAVES1, label: 'Waves', soundSource: require('../../assets/chimes/waves1.mp3')},
 }
 
 export type ChimeData = {
     key: BuiltInChimeSounds;
     label: string;
-    path: string;
+    soundSource: AVPlaybackSource;
 }
 
 export interface Chime {

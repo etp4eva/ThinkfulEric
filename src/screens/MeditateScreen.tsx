@@ -31,6 +31,7 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
           state={timerState}
           onComplete={() => {
             if (chimeList.length > 1) {
+              // TODO: Play chime
               setNextChime(chimeList[1]);
               setNextChimeTime(chimeList[1].numMinutes);
               setTimerState(CountDownState.RUNNING);

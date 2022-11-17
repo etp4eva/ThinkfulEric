@@ -1,9 +1,15 @@
 import { FlatList } from "react-native-bidirectional-infinite-scroll";
 import {Button, Dimensions, ListRenderItem, ListRenderItemInfo, Modal, Pressable, StyleSheet, Text, View} from "react-native"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Picker } from "@react-native-picker/picker";
-import { BuiltInChimesData, Chime, createChime } from "../utils/types";
+import { BuiltInChimesData, BuiltInChimeSounds, Chime, ChimeData, createChime } from "../utils/types";
+import { Audio } from 'expo-av'
+import { Sound, SoundObject } from "expo-av/build/Audio";
+
+//
+// TODO: /!\ BIG REFACTOR /!\
+//
 
 type TimePickerProps = {
     initialNumber: number;
@@ -19,7 +25,22 @@ export const TimePickerModal = (props: TimePickerProps) => {
         Array.from({length: props.initialNumber + 10}, (_, i) => i + 1)
     );
     const [selectedTime, selectTime] = useState(-1);
-    const [selectedSound, selectSound] = useState(undefined);
+    const [selectedChimeSound, selectChimeSound] = useState<BuiltInChimeSounds | undefined>(undefined);
+    const [selectedSound, setSound] = useState<Sound>();
+
+    // TODO: Abstract out all this sound playing stuff yuck !
+    async function playChime(chimeSound: BuiltInChimeSounds) {
+        const chimeData = BuiltInChimesData[chimeSound];
+        const { sound } = await Audio.Sound.createAsync(chimeData.soundSource);
+        setSound(sound);
+
+        await sound.playAsync();
+    }
+
+    const stopChime = async () => {
+        if (selectedSound && selectedSound._loaded)
+            await selectedSound.stopAsync();
+    }
 
     const loadEarlierNumbers = async () => {
         const lowNum: number = state[0]
@@ -58,6 +79,14 @@ export const TimePickerModal = (props: TimePickerProps) => {
         )
     }
 
+    useEffect(() => {
+        return selectedSound
+            ? () => {
+                selectedSound.unloadAsync();
+            }
+            : undefined;
+    }, [selectedSound]);    
+
     return (
         <Modal
           animationType="fade"
@@ -80,9 +109,14 @@ export const TimePickerModal = (props: TimePickerProps) => {
                         />
                     </LinearGradient>
                     <Picker
-                        selectedValue={selectedSound}
+                        selectedValue={selectedChimeSound}
                         onValueChange={(itemValue, itemIndex) => {
-                            selectSound(itemValue);
+                            stopChime();
+                            // TODO: Preview sound (stop sound when selected away)
+                            if (itemValue) {
+                                playChime(itemValue);
+                            }
+                            selectChimeSound(itemValue);
                         }}
                     >
                         <Picker.Item label='No Chime' value={undefined} />
@@ -95,9 +129,10 @@ export const TimePickerModal = (props: TimePickerProps) => {
                         title="ACCEPT"
                         onPress={() => {
                             props.handleChimeFn(
-                                createChime(selectedTime, selectedSound)
+                                createChime(selectedTime, selectedChimeSound)
                             );
                             selectTime(-1);
+                            stopChime();
                             props.closeModalFn()
                         }}
                     />  
@@ -105,6 +140,7 @@ export const TimePickerModal = (props: TimePickerProps) => {
                         title="CANCEL"                        
                         onPress={() => {
                             selectTime(-1);
+                            stopChime();
                             props.closeModalFn()
                         }}
                     /> 
