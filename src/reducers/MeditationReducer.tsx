@@ -1,3 +1,5 @@
+import { Chime, Meditation } from "../utils/types";
+
 enum Types {
   ADD_MEDITATION = 'ADD_MEDITATION',
   UPDATE_MEDITATION = 'UPDATE_MEDITATION',
@@ -43,19 +45,6 @@ export const actionCreators = {
         type: Types.REMOVE_CHIME,
         payload: numMinutes
     })
-}
-
-export type Meditation = {
-    key: string;
-    timestamp: Date;
-    month: number;
-    markString: string;
-    log: string;
-}
-
-export interface Chime {
-    label: string;
-    numMinutes: number;
 }
 
 const getFormattedDateString = (d: Date): string => {
