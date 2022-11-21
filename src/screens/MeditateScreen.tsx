@@ -1,8 +1,8 @@
 import { StackScreenProps } from "@react-navigation/stack"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { CountDown, CountDownState } from "../components/CountDown";
-import { Chime } from "../types/ChimePlayer";
+import { Chime, ChimePlayer } from "../types/ChimePlayer";
 import { RootStackParamList } from "./ScreenParams";
 
 enum MeditationMode {
@@ -18,6 +18,7 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
   const [lastChime, setLastChime] = useState<Chime>(chimeList[chimeList.length - 1]);
   const [timerState, setTimerState] = useState<CountDownState>(CountDownState.RUNNING);
   const [nextChimeTime, setNextChimeTime] = useState(nextChime.numMinutes);
+  const [chimePlayer, setChimePlayer] = useState(new ChimePlayer());
 
   let nextChimeCounter;
   if (chimeList.length > 1)
@@ -30,12 +31,16 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
           totalSeconds={0}
           state={timerState}
           onComplete={() => {
+            if (nextChime.chimeSound) {
+              chimePlayer.playChime(nextChime.chimeSound.key);
+            }
+
             if (chimeList.length > 1) {
-              // TODO: Play chime
               setNextChime(chimeList[1]);
               setNextChimeTime(chimeList[1].numMinutes);
               setTimerState(CountDownState.RUNNING);
             }
+
             setChimeList(
               chimeList.filter((value, index) => {return index !== 0})
             );            
@@ -44,6 +49,13 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
       </View>
     )
   }
+
+  useEffect(() => {
+    return () => {
+      chimePlayer.stopAllChimes();
+      chimePlayer.unloadChimes();
+    };
+  });
   
   return (
     <View style={styles.container}>
@@ -53,6 +65,11 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
         totalMinutes={lastChime.numMinutes}
         totalSeconds={0}
         state={timerState}
+        onComplete={() => {
+          if (lastChime.chimeSound) {
+            chimePlayer.playChime(lastChime.chimeSound.key);
+          }
+        }}
       />
       {nextChimeCounter}
       <FlatList 

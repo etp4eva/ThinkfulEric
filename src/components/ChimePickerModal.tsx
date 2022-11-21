@@ -17,7 +17,7 @@ export const ChimePickerModal = (props: ChimePickerProps) => {
     const [chimePlayer, setChimePlayer] = useState<ChimePlayer>(new ChimePlayer());
 
     useEffect(() => {
-        return () => {chimePlayer.unloadChimes};
+        return () => {chimePlayer.unloadChimes()};
     });    
 
     return (
