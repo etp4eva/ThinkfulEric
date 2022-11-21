@@ -7,14 +7,16 @@ type Params = {
 }
 
 export interface RemovableListItemInterface {
-    label: String;
+    labels: String[];
 }
 
 export const RemoveableItemList = (params: Params) => {
     const isRemoveRendered = (!params.minItems) || params.minItems < params.data.length;
     
     const renderItem = ({item, index}: {item: RemovableListItemInterface, index: number}) => {
+        const hasSubLabel = item.labels.length > 1;        
         let removeButton;
+        let subLabel;
 
         if (isRemoveRendered)
         {
@@ -26,9 +28,17 @@ export const RemoveableItemList = (params: Params) => {
             )
         }
 
+        if (hasSubLabel)
+        {
+            subLabel = (
+                <Text>{item.labels[1]}</Text>
+            )
+        }
+
         return (
             <View>
-                <Text>{item.label}</Text>
+                <Text>{item.labels[0]}</Text>
+                {subLabel}
                 {removeButton}
             </View>
         )

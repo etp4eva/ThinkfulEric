@@ -2,7 +2,7 @@ import { StackScreenProps } from "@react-navigation/stack"
 import { useState } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { CountDown, CountDownState } from "../components/CountDown";
-import { Chime } from "../types/types";
+import { Chime } from "../types/ChimePlayer";
 import { RootStackParamList } from "./ScreenParams";
 
 enum MeditationMode {
@@ -59,7 +59,10 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
         data={chimeList}
         renderItem={({item}) => {
           return (
-            <Text>{item.label}</Text>
+            <View>
+              <Text>{item.labels[0]}</Text>
+              <Text>{item.labels[1]}</Text>
+            </View>
           )
         }}
       />

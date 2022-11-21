@@ -1,4 +1,5 @@
-import { Chime, Meditation } from "../types/types";
+import { Chime } from "../types/ChimePlayer";
+import { Meditation } from "../types/types";
 
 enum Types {
   ADD_MEDITATION = 'ADD_MEDITATION',
@@ -89,7 +90,7 @@ export const MeditationInitialState: State = {
         [dummyMeditations[2].key]: dummyMeditations[2],
     },
     chimes: [
-        { label: '20 minutes', numMinutes: 20 },
+        { labels: ['20 minutes', 'Waves'], numMinutes: 20 },
     ]
 }
 
