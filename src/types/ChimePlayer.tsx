@@ -15,7 +15,7 @@ export const BuiltInChimesData: BuiltInChimesDataT = {
 export interface Chime {
     labels: string[];
     numMinutes: number;
-    chimeSound?: ChimeData;
+    chimeSound?: BuiltInChimeSounds;
 }
 
 type ChimeData = {
@@ -31,7 +31,7 @@ export const createChime = (numMinutes: number, sound?: BuiltInChimeSounds): Chi
     return {
       numMinutes: numMinutes,
       labels: [minuteLabel, chimeLabel],
-      chimeSound: (sound ? BuiltInChimesData[sound] : undefined),
+      chimeSound: (sound ? sound : undefined),
     }
   }
 

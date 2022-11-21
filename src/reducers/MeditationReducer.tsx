@@ -1,9 +1,10 @@
-import { Chime } from "../types/ChimePlayer";
+import { BuiltInChimesData, BuiltInChimeSounds, Chime } from "../types/ChimePlayer";
 import { Meditation } from "../types/types";
 
 enum Types {
   ADD_MEDITATION = 'ADD_MEDITATION',
   UPDATE_MEDITATION = 'UPDATE_MEDITATION',
+  DELETE_MEDITATION = 'DELETE_MEDITATION',
   ADD_CHIME = 'ADD_CHIME',
   REMOVE_CHIME = 'REMOVE_CHIME',
 }
@@ -18,6 +19,10 @@ type LogAction =
         payload: Meditation;
     }
     | {
+        type: Types.DELETE_MEDITATION;
+        payload: Meditation;
+    }
+    | {
         type: Types.ADD_CHIME;
         payload: Chime;
     }
@@ -27,14 +32,19 @@ type LogAction =
     }
 
 export const actionCreators = {
-    addMeditation: (timestamp: Date, log: string) => ({ 
+    addMeditation: (timestamp: Date, chimes: Chime[], timeElapsed: number) => ({ 
         type: Types.ADD_MEDITATION, 
-        payload: createMeditation(timestamp, log) 
+        payload: createBaseMeditation(timestamp, chimes, timeElapsed) 
     }),
 
     updateMeditation: (meditation: Meditation) => ({ 
         type: Types.UPDATE_MEDITATION, 
         payload: meditation
+    }),
+
+    deleteMeditation: (meditation: Meditation) => ({
+        type: Types.DELETE_MEDITATION,
+        payload: meditation,
     }),
 
     addChime: (chime: Chime) => ({
@@ -56,15 +66,41 @@ const getFormattedDateString = (d: Date): string => {
     return result;
 }
 
-const createMeditation = (timestamp: Date, log: string): Meditation => {
-    let m: Meditation = {
-        key: timestamp.toISOString(),
-        timestamp: timestamp,
-        month: timestamp.getMonth(),
-        markString: getFormattedDateString(timestamp),
-        log: log,
-    };
+const createBaseMeditation = (
+        timestamp: Date, 
+        chimes: Chime[], 
+        timeElapsed: number,
+    ): Meditation => {
+        let m: Meditation = {
+            key: timestamp.toISOString(),
+            timestamp: timestamp,
+            month: timestamp.getMonth(),
+            markString: getFormattedDateString(timestamp),
+            chimes: chimes,
+            timeElapsed: timeElapsed,
+        };
 
+        return m;
+}
+
+const createMeditation = (
+    timestamp: Date, 
+    chimes: Chime[], 
+    timeElapsed: number,
+    stressBefore?: number,
+    stressAfter?: number,
+    depth?: number,    
+    interrupted?: number,
+    location?: string,
+    log?: string,
+): Meditation => {
+    let m = createBaseMeditation(timestamp, chimes, timeElapsed);
+    m.stressBefore = stressBefore;
+    m.stressAfter = stressAfter;
+    m.depth = depth;
+    m.interrupted = interrupted;
+    m.location = location;
+    m.log = log;
     return m;
 }
 
@@ -77,10 +113,22 @@ export type State = {
     chimes: Chime[];
 }
 
+const dummyChimes: Chime[] = [
+    {labels: ['2 minutes', 'Chime'], numMinutes: 2, chimeSound: BuiltInChimeSounds.CHIME1},
+    {labels: ['20 minutes', 'Waves'], numMinutes: 20, chimeSound: BuiltInChimeSounds.WAVES1},
+]
+
 const dummyMeditations: Meditation[] = [
-    createMeditation(new Date('2022-11-08T08:18:12'), 'Earliest Hello'),
-    createMeditation(new Date('2022-11-09T08:18:12'), 'Earlier Hello'),
-    createMeditation(new Date('2022-11-09T10:18:12'), 'Hello'),
+    createMeditation(
+        new Date('2022-11-20T08:18:12'), dummyChimes, 20,
+        3, 2, 3, 0, 'on bed', 'Earliest hello'
+    ),
+    createMeditation(new Date('2022-11-21T08:18:12'), dummyChimes, 18.34,
+        2, 2, 4, 1, 'on chair', 'Early hello'
+    ),
+    createMeditation(new Date('2022-11-21T10:18:12'), dummyChimes, 20,
+        1, 4, 2, 0, 'on holiday', 'Late hello'
+    ),
 ]
 
 export const MeditationInitialState: State = {
@@ -106,12 +154,17 @@ export const MeditationReducer = (state: State, action: LogAction) => {
         case Types.ADD_MEDITATION:
             newState = {...state};
             newState.meditations[action.payload.key] = action.payload
-            return newState
+            return newState;
 
         case Types.UPDATE_MEDITATION:
             newState = {...state};
             newState.meditations[action.payload.key] = action.payload;
-            return newState
+            return newState;
+
+        case Types.DELETE_MEDITATION:
+            newState = {...state};
+            delete newState.meditations[action.payload.key];
+            return newState;
 
         case Types.ADD_CHIME:
             newState = {...state};

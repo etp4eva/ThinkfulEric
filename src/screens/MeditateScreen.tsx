@@ -32,7 +32,7 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
           state={timerState}
           onComplete={() => {
             if (nextChime.chimeSound) {
-              chimePlayer.playChime(nextChime.chimeSound.key);
+              chimePlayer.playChime(nextChime.chimeSound);
             }
 
             if (chimeList.length > 1) {
@@ -67,7 +67,7 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
         state={timerState}
         onComplete={() => {
           if (lastChime.chimeSound) {
-            chimePlayer.playChime(lastChime.chimeSound.key);
+            chimePlayer.playChime(lastChime.chimeSound);
           }
         }}
       />
