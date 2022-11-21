@@ -1,4 +1,4 @@
-import { Chime } from "../utils/types";
+import { Chime } from "../types/types";
 
 export type RootStackParamList = {
     'Home': undefined;

@@ -1,23 +1,22 @@
 import { StackScreenProps } from "@react-navigation/stack"
 import { useContext, useState } from "react"
 import { Button, View, Text, StyleSheet } from "react-native";
+import { ChimePickerModal } from "../components/ChimePickerModal";
 import { RemoveableItemList } from "../components/RemovableItemList";
-import { TimePickerModal } from "../components/ChimePickerModal";
 import { DispatchContext } from "../contexts/Context";
 import { actionCreators } from "../reducers/MeditationReducer";
-import { createChime } from "../utils/types";
 import { RootStackParamList } from "./ScreenParams";
 
 export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Home'> ) => {
     const {state, dispatch} = useContext(DispatchContext);
-    const [timePickerModalOpen, setTimePickerModalOpen] = useState<boolean>(false);
+    const [chimePickerModalOpen, setChimePickerModalOpen] = useState<boolean>(false);
   
     return (
       <View style={styles.container}>
-        <TimePickerModal 
+        <ChimePickerModal 
           initialNumber={1}
-          visible={timePickerModalOpen}
-          closeModalFn={() => setTimePickerModalOpen(!timePickerModalOpen)}
+          visible={chimePickerModalOpen}
+          closeModalFn={() => setChimePickerModalOpen(!chimePickerModalOpen)}
           handleChimeFn={(chime) => { 
             dispatch(actionCreators.addChime(chime)) 
           }}
@@ -33,7 +32,7 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
         />
         <Button 
           title='Add chime'
-          onPress={ () => setTimePickerModalOpen(true) }
+          onPress={ () => setChimePickerModalOpen(true) }
         />
         <RemoveableItemList 
           data={state.chimes}

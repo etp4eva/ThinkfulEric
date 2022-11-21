@@ -2,7 +2,7 @@ import { StackScreenProps } from "@react-navigation/stack"
 import { useState } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { CountDown, CountDownState } from "../components/CountDown";
-import { Chime } from "../utils/types";
+import { Chime } from "../types/types";
 import { RootStackParamList } from "./ScreenParams";
 
 enum MeditationMode {

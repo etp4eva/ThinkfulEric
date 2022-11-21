@@ -1,4 +1,4 @@
-import { Chime, Meditation } from "../utils/types";
+import { Chime, Meditation } from "../types/types";
 
 enum Types {
   ADD_MEDITATION = 'ADD_MEDITATION',
