@@ -20,12 +20,18 @@ const interruptionLevels = [
     'N/A', 'Once', 'Twice', 'Frequently'
 ]
 
+const calculateMinSec = (milliseconds: number) => {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = Math.floor((milliseconds - (minutes * 60000)) / 1000);
+
+    return {minutes: minutes, seconds: seconds};
+}
+
 const ReadMode = (
     meditation: Meditation,
     setEditing: (edit: boolean) => void
 ) => {
-    const timeMinutes = Math.floor(meditation.timeElapsed);
-    const timeSeconds = Math.floor((meditation.timeElapsed - timeMinutes) * 60);
+    const minSec = calculateMinSec(meditation.timeElapsed);
 
     let log;
     let location;
@@ -101,7 +107,7 @@ const ReadMode = (
             {interrupted}
             <View>
                 <Text>Time Elapsed:</Text>
-                <Text>{timeMinutes}:{timeSeconds.toString().padStart(2,'0')}</Text>
+                <Text>{minSec.minutes}:{minSec.seconds.toString().padStart(2,'0')}</Text>
             </View>
             <View>
                 <Text>Chimes:</Text>

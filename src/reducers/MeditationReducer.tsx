@@ -66,7 +66,7 @@ const getFormattedDateString = (d: Date): string => {
     return result;
 }
 
-const createBaseMeditation = (
+export const createBaseMeditation = (
         timestamp: Date, 
         chimes: Chime[], 
         timeElapsed: number,
@@ -120,13 +120,13 @@ const dummyChimes: Chime[] = [
 
 const dummyMeditations: Meditation[] = [
     createMeditation(
-        new Date('2022-11-20T08:18:12'), dummyChimes, 20,
+        new Date('2022-11-20T08:18:12'), dummyChimes, 200000,
         3, 2, 3, 0, 'on bed', 'Earliest hello'
     ),
-    createMeditation(new Date('2022-11-21T08:18:12'), dummyChimes, 18.34,
+    createMeditation(new Date('2022-11-21T08:18:12'), dummyChimes, 18344506,
         2, 2, 4, 1, 'on chair', 'Early hello'
     ),
-    createMeditation(new Date('2022-11-21T10:18:12'), dummyChimes, 20,
+    createMeditation(new Date('2022-11-21T10:18:12'), dummyChimes, 2052510,
         1, 4, 2, 0, 'on holiday', 'Late hello'
     ),
 ]

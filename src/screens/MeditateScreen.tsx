@@ -1,7 +1,8 @@
 import { StackScreenProps } from "@react-navigation/stack"
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, Button } from "react-native";
 import { CountDown, CountDownState } from "../components/CountDown";
+import { createBaseMeditation } from "../reducers/MeditationReducer";
 import { Chime, ChimePlayer } from "../types/ChimePlayer";
 import { RootStackParamList } from "./ScreenParams";
 
@@ -16,9 +17,13 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
   const [chimeList, setChimeList] = useState<Chime[]>(route.params.chimeList);
   const [nextChime, setNextChime] = useState<Chime>(chimeList[0]);
   const [lastChime, setLastChime] = useState<Chime>(chimeList[chimeList.length - 1]);
-  const [timerState, setTimerState] = useState<CountDownState>(CountDownState.RUNNING);
+  const [timerState, setTimerState] = useState<CountDownState>(CountDownState.PAUSED);
+  const [timerStartTime, setTimerStartTime] = useState(Date.now());
   const [nextChimeTime, setNextChimeTime] = useState(nextChime.numMinutes);
   const [chimePlayer, setChimePlayer] = useState(new ChimePlayer());
+  const [meditation, setMeditation] = useState(
+    createBaseMeditation(new Date(), route.params.chimeList, 0)
+  );
 
   let nextChimeCounter;
   if (chimeList.length > 1)
@@ -51,11 +56,26 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
   }
 
   useEffect(() => {
-    return () => {
+    const blur = navigation.addListener('blur', () => {
+      setTimerState(CountDownState.PAUSED);
       chimePlayer.stopAllChimes();
       chimePlayer.unloadChimes();
-    };
+    });
+
+    return blur;
   });
+
+  useEffect(() => {
+    if (timerState === CountDownState.PAUSED)
+    {
+      meditation.timeElapsed = meditation.timeElapsed + Date.now() - timerStartTime;
+    }
+
+    if (timerState === CountDownState.RUNNING)
+    {
+      setTimerStartTime(Date.now());
+    }
+  }, [timerState])
   
   return (
     <View style={styles.container}>
@@ -67,11 +87,26 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
         state={timerState}
         onComplete={() => {
           if (lastChime.chimeSound) {
-            chimePlayer.playChime(lastChime.chimeSound);
+            chimePlayer.playChime(lastChime.chimeSound);            
           }
+
+          setTimerState(CountDownState.PAUSED);
         }}
       />
       {nextChimeCounter}
+      <Button 
+        title={timerState === CountDownState.PAUSED ? "START" : "PAUSE"}
+        onPress={() => {
+          setTimerState(
+            timerState === CountDownState.RUNNING 
+              ? CountDownState.PAUSED
+              : CountDownState.RUNNING
+          );
+        }}
+      />
+      <Button
+        title='RESTART {TODO}'
+      />
       <FlatList 
         data={chimeList}
         renderItem={({item}) => {

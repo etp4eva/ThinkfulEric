@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Text } from "react-native"
+import { Timer } from "../types/Timer";
 
 export enum CountDownState {
     RUNNING = 'RUNNING',
     PAUSED = 'PAUSED',
-}
-
-enum InternalState {
-    COMPLETE = 'COMPLETE',
-    ON_COMPLETE_FIRED = 'ON_COMPLETE_FIRED',
 }
 
 type Props = {
@@ -20,12 +16,13 @@ type Props = {
     onComplete?: () => void;
 };
 
-const generateDisplayString = (minutes: number, seconds: number) => {
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`
+const generateDisplayString = (ms: number) => {
+    const minSec = calculateMinSec(ms);
+    return generateDisplayStringMinSec(minSec.minutes, minSec.seconds);
 }
 
-const calculateMs = (minutes: number, seconds: number) => {
-    return minutes * 60000 + seconds * 1000;
+const generateDisplayStringMinSec = (minutes: number, seconds: number) => {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`
 }
 
 const calculateMinSec = (milliseconds: number) => {
@@ -35,52 +32,54 @@ const calculateMinSec = (milliseconds: number) => {
     return {minutes: minutes, seconds: seconds};
 }
 
+const calculateMs = (minutes: number, seconds: number) => {
+    return minutes * 60000 + seconds * 1000;
+}
+
 export const CountDown = (props: Props) => {
+    const [timer, setTimer] = useState(new Timer(
+        calculateMs(props.totalMinutes, props.totalSeconds)
+    ))
     const [timerDisplay, updateDisplay] = useState(
-        generateDisplayString(props.totalMinutes, props.totalSeconds)
+        generateDisplayStringMinSec(props.totalMinutes, props.totalSeconds)
     );
-    const elapsedMilliseconds = useState(0);
-    const lastTime = useState(Date.now());
-    const [state, setState] = useState<CountDownState | InternalState>(props.state);
-    const [totalMs, setTotal] = useState(calculateMs(props.totalMinutes, props.totalSeconds));
+    const [state, setState] = useState<CountDownState>(props.state);
+    
+    useEffect(() => {
+        const newMs = calculateMs(props.totalMinutes, props.totalSeconds);
+        setTimer(new Timer(            
+            newMs,
+            timer.onComplete,
+            timer.onTick,
+            timer.isRunning,
+        ))
 
-    const updateTime = () => {
-        if (state === InternalState.COMPLETE && props.onComplete) {
-            props.onComplete();
-            setState(InternalState.ON_COMPLETE_FIRED);
-        }
-
-        if (state === CountDownState.RUNNING)
-        {
-            const interval = Date.now() - lastTime[0];
-            elapsedMilliseconds[0] = elapsedMilliseconds[0] + interval;
-
-            let msRemaining = totalMs - elapsedMilliseconds[0];
-
-            if (msRemaining <= 0)
-            {
-                msRemaining = 0;
-                setState(InternalState.COMPLETE);              
-            }
-
-            let minSec = calculateMinSec(msRemaining);
-
-            updateDisplay(generateDisplayString(minSec.minutes, minSec.seconds));
-        }
-
-        lastTime[0] = Date.now();
-    }
+    }, [props.totalMinutes, props.totalSeconds])
 
     useEffect(() => {
-        const interval = setInterval(updateTime, 100);
-
-        return () => clearInterval(interval);
-    });
-
-    useEffect(() => {
-        setTotal(calculateMs(props.totalMinutes, props.totalSeconds));
         setState(props.state);
-    }, [props])
+        if (props.state === CountDownState.PAUSED) {
+            timer.stopTimer();
+        } else {            
+            timer.runTimer();
+        }
+    }, [props.state])
+
+    useEffect(() => {
+        timer.onTick = () => {
+            updateDisplay(
+                generateDisplayString(timer.remainingMs)
+            );  
+        }
+
+        timer.onComplete = () => {
+            updateDisplay('0:00');
+            setState(CountDownState.PAUSED);
+
+            if (props.onComplete)
+                props.onComplete();
+        }
+    }, [timer])
 
     return <Text>{timerDisplay}</Text>
 
