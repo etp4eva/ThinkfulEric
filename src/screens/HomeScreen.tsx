@@ -5,7 +5,6 @@ import { ChimePickerModal } from "../components/ChimePickerModal";
 import { RemoveableItemList } from "../components/RemovableItemList";
 import { DispatchContext } from "../contexts/Context";
 import { actionCreators } from "../reducers/MeditationReducer";
-import { Chime } from "../types/ChimePlayer";
 import { createNewMeditation } from "../types/types";
 import { RootStackParamList } from "./ScreenParams";
 

@@ -7,6 +7,6 @@ export type RootStackParamList = {
     };
     'Log': undefined;
     'MeditationInfo': {
-      meditationKey: string
+      meditation: Meditation;
     }
   }

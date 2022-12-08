@@ -274,11 +274,10 @@ export const MediationInfoScreen = ({ route, navigation }: StackScreenProps<Root
 
     const [isEditing, setEditing] = useState(false);
     
-    let meditation: Meditation = state.meditations[route.params.meditationKey];
     if (isEditing) {
-        return EditMode(meditation, setEditing, dispatch);
+        return EditMode(route.params.meditation, setEditing, dispatch);
     } else {
-        return ReadMode(meditation, setEditing);
+        return ReadMode(route.params.meditation, setEditing);
     }
 };
 

@@ -51,7 +51,7 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
     const meditation: Meditation = state.meditations[item];
     return (
       <TouchableHighlight
-        onPress={() => navigation.push('MeditationInfo', {meditationKey: meditation.key})}
+        onPress={() => navigation.push('MeditationInfo', {meditation: meditation})}
       >
         <Text>{meditation.key}</Text>
       </TouchableHighlight>
