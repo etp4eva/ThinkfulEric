@@ -307,7 +307,7 @@ const EditMode = (
                 {(mode === MeditationInfoMode.LOG && discardChangesButton)}
                 {(mode === MeditationInfoMode.PRE_MED && startMeditationButton)}
                 {(mode === MeditationInfoMode.PRE_MED && cancelMeditationButton)}
-                {deleteMeditationButton}
+                {mode !== MeditationInfoMode.PRE_MED && deleteMeditationButton}
             </View>
         </View>
     )
