@@ -6,7 +6,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { DispatchContext } from "../contexts/Context";
 import { MeditationMap } from "../reducers/MeditationReducer";
 import { Meditation } from "../types/types";
-import { RootStackParamList } from "./ScreenParams";
+import { MeditationInfoMode, RootStackParamList } from "./ScreenParams";
 
 interface MarkedList { 
   [key: string]: {
@@ -51,7 +51,7 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
     const meditation: Meditation = state.meditations[item];
     return (
       <TouchableHighlight
-        onPress={() => navigation.push('MeditationInfo', {meditation: meditation})}
+        onPress={() => navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.LOG })}
       >
         <Text>{meditation.key}</Text>
       </TouchableHighlight>

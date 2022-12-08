@@ -1,5 +1,5 @@
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from './ScreenParams';
+import { MeditationInfoMode, RootStackParamList } from './ScreenParams';
 import { Button, Text, View, StyleSheet, TextInput } from 'react-native'
 import { useContext, useState } from 'react';
 import { DispatchContext } from '../contexts/Context';
@@ -162,8 +162,10 @@ const CustomSlider = (props: CustomSliderProps) => {
 
 const EditMode = (
     meditation: Meditation,
+    mode: MeditationInfoMode,
     setEditing: (edit: boolean) => void,
     dispatch: React.Dispatch<any>,
+    {route, navigation}: StackScreenProps<RootStackParamList, 'MeditationInfo'>
 ) => {
     let newMeditation: Meditation = JSON.parse(JSON.stringify(meditation))
 
@@ -239,6 +241,56 @@ const EditMode = (
         />
     )
 
+    let startMeditationButton = (
+        <Button
+            title='Start Meditation'
+            onPress={() => {
+                dispatch(actionCreators.updateMeditation(newMeditation));
+                navigation.replace('Meditate', {meditation: newMeditation});
+            }}
+        />
+    )
+
+    let cancelMeditationButton = (
+        <Button
+            title='Cancel Meditation'
+            onPress={() =>{
+                navigation.popToTop();
+            }}            
+        />
+    )
+
+    let saveChangesButton = (
+        <Button
+            title='Save changes'
+            onPress={() => { 
+                dispatch(actionCreators.updateMeditation(newMeditation))
+                setEditing(false); 
+                if (mode === MeditationInfoMode.POST_MED)
+                {
+                    navigation.popToTop();
+                }
+            }}
+        />
+    )
+
+    let discardChangesButton = (
+        <Button
+            title='Discard changes'
+            onPress={() => { setEditing(false); }}
+        />
+    )
+
+    let deleteMeditationButton = (
+        <Button
+            title='Delete meditation'
+            onPress={() => { 
+                dispatch(actionCreators.deleteMeditation(meditation));
+                navigation.pop();
+            }}
+        />
+    )
+
     return (
         <View>
             <View>
@@ -246,22 +298,16 @@ const EditMode = (
             </View>
             {location}
             {log}            
-            {stressBefore}
-            {stressAfter}
-            {depth}
-            {interrupted}
+            {(mode !== MeditationInfoMode.POST_MED) && stressBefore}
+            {(mode !== MeditationInfoMode.PRE_MED) && stressAfter}
+            {(mode !== MeditationInfoMode.PRE_MED) && depth}
+            {(mode !== MeditationInfoMode.PRE_MED) && interrupted}
             <View style={styles.sideBySide}>
-                <Button
-                    title='Save changes'
-                    onPress={() => { 
-                        dispatch(actionCreators.updateMeditation(newMeditation))
-                        setEditing(false); 
-                    }}
-                />
-                <Button
-                    title='Discard changes'
-                    onPress={() => { setEditing(false); }}
-                />
+                {(mode !== MeditationInfoMode.PRE_MED && saveChangesButton)}
+                {(mode === MeditationInfoMode.LOG && discardChangesButton)}
+                {(mode === MeditationInfoMode.PRE_MED && startMeditationButton)}
+                {(mode === MeditationInfoMode.PRE_MED && cancelMeditationButton)}
+                {deleteMeditationButton}
             </View>
         </View>
     )
@@ -272,10 +318,10 @@ const EditMode = (
 export const MediationInfoScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'MeditationInfo'> ) => {
     const {state, dispatch} = useContext(DispatchContext);
 
-    const [isEditing, setEditing] = useState(false);
+    const [isEditing, setEditing] = useState(route.params.mode !== MeditationInfoMode.LOG);
     
     if (isEditing) {
-        return EditMode(route.params.meditation, setEditing, dispatch);
+        return EditMode(route.params.meditation, route.params.mode, setEditing, dispatch, {route, navigation});
     } else {
         return ReadMode(route.params.meditation, setEditing);
     }

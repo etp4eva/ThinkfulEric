@@ -1,9 +1,11 @@
 import { StackScreenProps } from "@react-navigation/stack"
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, Button } from "react-native";
 import { CountDown, CountDownState } from "../components/CountDown";
+import { DispatchContext } from "../contexts/Context";
+import { actionCreators } from "../reducers/MeditationReducer";
 import { Chime, ChimePlayer } from "../types/ChimePlayer";
-import { RootStackParamList } from "./ScreenParams";
+import { RootStackParamList, MeditationInfoMode } from "./ScreenParams";
 
 enum MeditationMode {
   MEDITATION_NOT_STARTED = 'MEDITATION_NOT_STARTED',
@@ -13,6 +15,7 @@ enum MeditationMode {
 }
 
 export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Meditate'> ) => {
+  const {state, dispatch} = useContext(DispatchContext);
   const [chimeList, setChimeList] = useState<Chime[]>(route.params.meditation.chimes);
   const [nextChime, setNextChime] = useState<Chime>(chimeList[0]);
   const [lastChime, setLastChime] = useState<Chime>(chimeList[chimeList.length - 1]);
@@ -66,6 +69,7 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
     if (timerState === CountDownState.PAUSED)
     {
       meditation.timeElapsed = meditation.timeElapsed + Date.now() - timerStartTime;
+      dispatch(actionCreators.updateMeditation(meditation));
     }
 
     if (timerState === CountDownState.RUNNING)
@@ -103,6 +107,19 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
       />
       <Button
         title='RESTART {TODO}'
+      />
+      <Button
+        title='END'
+        onPress={() => {
+          navigation.replace('MeditationInfo', {meditation: meditation, mode: MeditationInfoMode.POST_MED})
+        }}
+      />
+      <Button
+        title='CANCEL'
+        onPress={() => {
+          dispatch(actionCreators.deleteMeditation(meditation));
+          navigation.popToTop()
+        }}
       />
       <FlatList 
         data={chimeList}

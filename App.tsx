@@ -19,9 +19,9 @@ export default function App() {
   return (
     <DispatchContext.Provider value={{state, dispatch}}>
       <NavigationContainer>
-        <RootStack.Navigator initialRouteName='Home'>
+        <RootStack.Navigator initialRouteName='Home' >
           <RootStack.Screen name='Home' component={HomeScreen} />
-          <RootStack.Screen name='Meditate' component={MeditateScreen} />
+          <RootStack.Screen name='Meditate' component={MeditateScreen}/>
           <RootStack.Screen name='Log' component={LogScreen} />
           <RootStack.Screen name='MeditationInfo' component={MediationInfoScreen} />
         </RootStack.Navigator>
