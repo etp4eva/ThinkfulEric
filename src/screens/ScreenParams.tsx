@@ -1,9 +1,9 @@
-import { Chime } from "../types/types";
+import { Meditation } from "../types/types";
 
 export type RootStackParamList = {
     'Home': undefined;
     'Meditate': {
-      chimeList: Chime[]
+      meditation: Meditation;
     };
     'Log': undefined;
     'MeditationInfo': {

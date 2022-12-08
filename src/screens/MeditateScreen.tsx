@@ -2,7 +2,6 @@ import { StackScreenProps } from "@react-navigation/stack"
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, Button } from "react-native";
 import { CountDown, CountDownState } from "../components/CountDown";
-import { createBaseMeditation } from "../reducers/MeditationReducer";
 import { Chime, ChimePlayer } from "../types/ChimePlayer";
 import { RootStackParamList } from "./ScreenParams";
 
@@ -14,16 +13,14 @@ enum MeditationMode {
 }
 
 export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Meditate'> ) => {
-  const [chimeList, setChimeList] = useState<Chime[]>(route.params.chimeList);
+  const [chimeList, setChimeList] = useState<Chime[]>(route.params.meditation.chimes);
   const [nextChime, setNextChime] = useState<Chime>(chimeList[0]);
   const [lastChime, setLastChime] = useState<Chime>(chimeList[chimeList.length - 1]);
   const [timerState, setTimerState] = useState<CountDownState>(CountDownState.PAUSED);
   const [timerStartTime, setTimerStartTime] = useState(Date.now());
   const [nextChimeTime, setNextChimeTime] = useState(nextChime.numMinutes);
   const [chimePlayer, setChimePlayer] = useState(new ChimePlayer());
-  const [meditation, setMeditation] = useState(
-    createBaseMeditation(new Date(), route.params.chimeList, 0)
-  );
+  const [meditation, setMeditation] = useState(route.params.meditation);
 
   let nextChimeCounter;
   if (chimeList.length > 1)

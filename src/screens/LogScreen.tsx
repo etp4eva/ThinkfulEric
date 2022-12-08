@@ -4,7 +4,8 @@ import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight } from "reac
 import { Calendar } from "react-native-calendars";
 import { FlatList } from "react-native-gesture-handler";
 import { DispatchContext } from "../contexts/Context";
-import { Meditation, MeditationMap } from "../reducers/MeditationReducer";
+import { MeditationMap } from "../reducers/MeditationReducer";
+import { Meditation } from "../types/types";
 import { RootStackParamList } from "./ScreenParams";
 
 interface MarkedList { 

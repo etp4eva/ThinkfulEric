@@ -5,6 +5,8 @@ import { ChimePickerModal } from "../components/ChimePickerModal";
 import { RemoveableItemList } from "../components/RemovableItemList";
 import { DispatchContext } from "../contexts/Context";
 import { actionCreators } from "../reducers/MeditationReducer";
+import { Chime } from "../types/ChimePlayer";
+import { createNewMeditation } from "../types/types";
 import { RootStackParamList } from "./ScreenParams";
 
 export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Home'> ) => {
@@ -24,7 +26,7 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
         <Text>Dial in your meditation settings here. When should chimes occur</Text>
         <Button 
           title='Start Meditation'
-          onPress={ () => navigation.navigate('Meditate', {chimeList: state.chimes})}
+          onPress={ () => navigation.navigate('Meditate', { meditation: createNewMeditation(state.chimes) })}
         />
         <Button 
           title='View log'

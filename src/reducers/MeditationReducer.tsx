@@ -1,5 +1,5 @@
 import { BuiltInChimesData, BuiltInChimeSounds, Chime } from "../types/ChimePlayer";
-import { Meditation } from "../types/types";
+import { createBaseMeditation, Meditation } from "../types/types";
 
 enum Types {
   ADD_MEDITATION = 'ADD_MEDITATION',
@@ -56,31 +56,6 @@ export const actionCreators = {
         type: Types.REMOVE_CHIME,
         payload: numMinutes
     })
-}
-
-const getFormattedDateString = (d: Date): string => {
-    const ye = String(d.getFullYear());
-    const mo = String(d.getMonth() + 1).padStart(2, '0');
-    const da = String(d.getDate()).padStart(2, '0');
-    const result = `${ye}-${mo}-${da}`;
-    return result;
-}
-
-export const createBaseMeditation = (
-        timestamp: Date, 
-        chimes: Chime[], 
-        timeElapsed: number,
-    ): Meditation => {
-        let m: Meditation = {
-            key: timestamp.toISOString(),
-            timestamp: timestamp,
-            month: timestamp.getMonth(),
-            markString: getFormattedDateString(timestamp),
-            chimes: chimes,
-            timeElapsed: timeElapsed,
-        };
-
-        return m;
 }
 
 const createMeditation = (
