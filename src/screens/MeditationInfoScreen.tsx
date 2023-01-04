@@ -297,17 +297,17 @@ const EditMode = (
                 <Text>{meditation.key}</Text>
             </View>
             {location}
-            {log}            
-            {(mode !== MeditationInfoMode.POST_MED) && stressBefore}
-            {(mode !== MeditationInfoMode.PRE_MED) && stressAfter}
-            {(mode !== MeditationInfoMode.PRE_MED) && depth}
-            {(mode !== MeditationInfoMode.PRE_MED) && interrupted}
+            {log}      
+            { (mode === MeditationInfoMode.PRE_MED  || MeditationInfoMode.LOG) ? stressBefore : null }
+            { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? stressAfter : null }
+            { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? depth : null }
+            { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? interrupted : null }
             <View style={styles.sideBySide}>
-                {(mode !== MeditationInfoMode.PRE_MED && saveChangesButton)}
-                {(mode === MeditationInfoMode.LOG && discardChangesButton)}
-                {(mode === MeditationInfoMode.PRE_MED && startMeditationButton)}
-                {(mode === MeditationInfoMode.PRE_MED && cancelMeditationButton)}
-                {mode !== MeditationInfoMode.PRE_MED && deleteMeditationButton}
+                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? saveChangesButton : null }
+                {  mode === MeditationInfoMode.LOG ? discardChangesButton : null }
+                {  mode === MeditationInfoMode.PRE_MED ? startMeditationButton : null }
+                {  mode === MeditationInfoMode.PRE_MED ? cancelMeditationButton : null }                
+                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? deleteMeditationButton : null }
             </View>
         </View>
     )
