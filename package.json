@@ -18,6 +18,7 @@
     "@stream-io/flat-list-mvcp": "^0.10.2",
     "expo": "~46.0.16",
     "expo-av": "~12.0.4",
+    "expo-font": "~10.2.0",
     "expo-linear-gradient": "~11.4.0",
     "expo-status-bar": "~1.4.0",
     "react": "18.0.0",
@@ -35,7 +36,14 @@
     "@babel/core": "^7.12.9",
     "@types/react": "~18.0.14",
     "@types/react-native": "~0.69.1",
-    "typescript": "~4.3.5"
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-standard-with-typescript": "^24.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-react": "^7.31.11",
+    "typescript": "*"
   },
   "private": true
 }

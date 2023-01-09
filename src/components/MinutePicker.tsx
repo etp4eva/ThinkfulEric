@@ -52,7 +52,7 @@ export const MinutePicker = (props: MinutePickerProps) => {
                     selectTime(num.item);
                 }}
             >
-                <Text>{(num.item === 1 ? `${num.item} minute` : `${num.item} minutes`)}</Text>
+                <Text style={{ marginHorizontal: 5 }}>{(num.item === 1 ? `${num.item} minute` : `${num.item} minutes`)}</Text>
             </Pressable>
         )
     }
@@ -60,7 +60,7 @@ export const MinutePicker = (props: MinutePickerProps) => {
     return (
         <LinearGradient
             style={styles.modal}
-            colors={['#969696','#FFF', '#FFF', '#FFF', '#969696']}
+            colors={['#96969660','#FFFFFF60', '#FFFFFF60', '#FFFFFF60', '#96969660']}
         >                  
             <FlatList
                 data={state}
@@ -75,9 +75,12 @@ export const MinutePicker = (props: MinutePickerProps) => {
 
 const styles = StyleSheet.create({
     timeSelected: {
-        backgroundColor: 'red',
+        backgroundColor: '#FFFFFFBB',
     },
     modal: {
         height: Dimensions.get('screen').height / 6,
+        borderWidth: 1,
+        borderColor: '#778664',
+        marginBottom: 5,     
     },
 });

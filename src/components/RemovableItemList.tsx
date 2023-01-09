@@ -1,9 +1,10 @@
-import { Text, Button, FlatList, ListRenderItem, View } from "react-native"
+import { Text, Button, FlatList, ListRenderItem, View, StyleProp, ViewStyle, StyleSheet, Pressable, TextStyle } from "react-native"
 
 type Params = {
     data: any[];
     removeFn: (idx: number) => void;
     minItems?: number;
+    textStyle?: StyleProp<TextStyle>;
 }
 
 export interface RemovableListItemInterface {
@@ -21,23 +22,24 @@ export const RemoveableItemList = (params: Params) => {
         if (isRemoveRendered)
         {
             removeButton = (
-                <Button
-                    title="X"
+                <Pressable
                     onPress={() => params.removeFn(index)}
-                />
+                >
+                    <Text style={[params.textStyle]}>X</Text>
+                </Pressable>
             )
         }
 
         if (hasSubLabel)
         {
             subLabel = (
-                <Text>{item.labels[1]}</Text>
+                <Text style={params.textStyle}>{item.labels[1]}</Text>
             )
         }
 
         return (
-            <View>
-                <Text>{item.labels[0]}</Text>
+            <View style={[styles.item, index % 2 === 1 ? styles.itemBackground : null]}>
+                <Text style={[styles.label, params.textStyle]}>{item.labels[0]}</Text>
                 {subLabel}
                 {removeButton}
             </View>
@@ -48,6 +50,25 @@ export const RemoveableItemList = (params: Params) => {
         <FlatList 
             data={params.data}
             renderItem={renderItem}
+            style={styles.list}
         />
     )
 }
+
+const styles = StyleSheet.create({
+    item: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',       
+        alignItems: 'center',        
+    },
+    itemBackground: {
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    label: {
+        width: '30%',
+        textAlign: 'center',
+    },
+    list: {
+        flexGrow: 0
+    }
+})
