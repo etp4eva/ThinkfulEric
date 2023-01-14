@@ -1,20 +1,21 @@
 import { StackScreenProps } from "@react-navigation/stack"
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { FlatList } from "react-native-gesture-handler";
 import { DispatchContext } from "../contexts/Context";
 import { MeditationMap } from "../reducers/MeditationReducer";
-import { Meditation } from "../types/types";
+import { Meditation, MeditationMarker } from "../types/types";
 import { MeditationInfoMode, RootStackParamList } from "./ScreenParams";
+import { Persister } from "../types/Persister";
 
 interface MarkedList { 
   [key: string]: {
-    dots: [{ key: string, color: string, selectedDotColor: string }]
+      dots: [{ key: string, color: string, selectedDotColor: string }]
   }; 
 }
-  
-const generateMeditationList = (meditations: MeditationMap): MarkedList => {
+
+const generateMarkedList = (meditations: MeditationMap): MarkedList => {
   let outList: MarkedList = {}
 
   Object.keys(meditations).forEach((key) => {
@@ -34,6 +35,7 @@ const generateMeditationList = (meditations: MeditationMap): MarkedList => {
         dot.key = numDots.toString();
         outList[dateKey].dots.push(dot);
       }  
+
     } else {
       outList[dateKey] = {dots: [dot]}
     }
@@ -42,13 +44,45 @@ const generateMeditationList = (meditations: MeditationMap): MarkedList => {
   return outList
 }
 
+const filterMeditationMap = (
+  meditations: MeditationMap, 
+  month: number, 
+  dayOfMonth?: number
+): MeditationMap => {
+  let result: MeditationMap = {};
+
+  Object.keys(meditations).forEach(key => {
+    const med = meditations[key];
+    const date = new Date(med.timestamp)
+
+    if (month === date.getMonth())
+    {      
+      if (dayOfMonth && dayOfMonth === date.getDate())
+      {
+        result[key] = med;        
+        return;
+      } else if (dayOfMonth) {
+        return;
+      }
+
+      result[key] = med;
+    }
+  })
+
+  return result;
+}
+
 export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Log'> ) => {
   const {state, dispatch} = useContext(DispatchContext);
-  const markedDate = generateMeditationList(state.meditations);
+  const monthMeditations = useState<MeditationMap>(state.meditations)
+  const monthMeditationsML = useState<MarkedList>(generateMarkedList(state.meditations))
+  const [filteredMeditationMap, setFilteredMeditationMap] = useState<MeditationMap>(
+    filterMeditationMap(state.meditations, new Date(Date.now()).getMonth())
+  )
 
-  // TODO: Filter meditation list by month displayed
   const renderItem: ListRenderItem<string> = ({item}) => {
-    const meditation: Meditation = state.meditations[item];
+    const meditation: Meditation = monthMeditations[0][item];
+    
     return (
       <TouchableHighlight
         onPress={() => navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.LOG })}
@@ -58,18 +92,31 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
     )
   }
   
-  // TODO: Filter list based on selection
-  // TODO: Open view / edit log screen on click 
   return (
     <View style={styles.container}>
       <Text>A monthly calendar with meditation days highlighted and you can click them to read your log. Also a list in reverse chronological order</Text>
       <Calendar 
         maxDate={new Date().toUTCString()}
         markingType={'multi-dot'}
-        markedDates={markedDate}
+        markedDates={monthMeditationsML[0]}
+        onDayPress={(selectedDate) => {
+          const filteredMap = filterMeditationMap(monthMeditations[0], selectedDate.month - 1, selectedDate.day)
+          setFilteredMeditationMap(filteredMap);
+        }}
+        onMonthChange={async (date) => {
+          monthMeditations[0] = await Persister.getMeditationMonthList(date.month);
+          
+          if(!monthMeditations[0])
+            return;
+
+          monthMeditationsML[0] = generateMarkedList(monthMeditations[0]);
+          setFilteredMeditationMap(
+            filterMeditationMap(monthMeditations[0], date.month)
+          );
+        }}
       />
       <FlatList 
-        data={Object.keys(state.meditations)}
+        data={Object.keys(filteredMeditationMap)}
         renderItem={renderItem}
       />
       

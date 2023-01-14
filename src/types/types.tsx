@@ -50,3 +50,13 @@ export const createNewMeditation = (chimes: Chime[]): Meditation => {
 
     return meditation;
 }
+
+export interface MeditationMarker {
+    key: string, color: string, selectedDotColor: string
+}
+
+export interface MarkedList { 
+    [key: string]: {
+        dots: MeditationMarker[]
+    }; 
+}
