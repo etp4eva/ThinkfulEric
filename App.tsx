@@ -9,10 +9,9 @@ import { LogScreen } from './src/screens/LogScreen';
 import { MediationInfoScreen } from './src/screens/MeditationInfoScreen';
 import React, { useReducer } from 'react';
 import { Text } from 'react-native';
-import { MeditationInitialState, MeditationMap, MeditationReducer, State, Types, actionCreators } from './src/reducers/MeditationReducer';
+import { MeditationInitialState, MeditationMap, MeditationReducer, Types } from './src/reducers/MeditationReducer';
 import { DispatchContext } from './src/contexts/Context';
 import { Theme } from './src/screens/Themes';
-import { useFonts } from 'expo-font';
 import { Persister } from './src/types/Persister';
 import { Chime } from './src/types/ChimePlayer';
 
@@ -20,10 +19,6 @@ const RootStack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   const [state, dispatch] = useReducer(MeditationReducer, MeditationInitialState);
-  const [fontsLoaded] = useFonts({
-    'Comfortaa': require('./assets/fonts/Comfortaa.ttf'),
-    'ComfortaaBold': require('./assets/fonts/ComfortaaBold.ttf'),
-  })
 
   React.useEffect(() => {
     const checkAsync = async () => {
@@ -40,12 +35,7 @@ export default function App() {
     }
     checkAsync()
   }, [])
-
-  if (!fontsLoaded)
-  {
-    return (<Text>Loading</Text>)
-  }
-
+  
   return (
     <DispatchContext.Provider value={{state, dispatch}}>
       <NavigationContainer>
@@ -53,15 +43,14 @@ export default function App() {
           <RootStack.Screen 
             name='Home' 
             component={HomeScreen} 
-            options={{
-              headerStyle: {
-                backgroundColor: Theme.colors.border
-              },
-              headerTintColor: Theme.colors.headerTint
-            }}
+            options={Theme.headerOptions}
           />
           <RootStack.Screen name='Meditate' component={MeditateScreen}/>
-          <RootStack.Screen name='Log' component={LogScreen} />
+          <RootStack.Screen 
+            name='Log'
+            component={LogScreen}
+            options={Theme.headerOptions}
+          />
           <RootStack.Screen name='MeditationInfo' component={MediationInfoScreen} />
         </RootStack.Navigator>
       </NavigationContainer>

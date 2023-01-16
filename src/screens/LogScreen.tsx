@@ -1,6 +1,6 @@
 import { StackScreenProps } from "@react-navigation/stack"
 import { useContext, useState } from "react";
-import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight } from "react-native";
+import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight, ImageBackground } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { FlatList } from "react-native-gesture-handler";
 import { DispatchContext } from "../contexts/Context";
@@ -8,6 +8,7 @@ import { MeditationMap } from "../reducers/MeditationReducer";
 import { Meditation, MeditationMarker } from "../types/types";
 import { MeditationInfoMode, RootStackParamList } from "./ScreenParams";
 import { Persister } from "../types/Persister";
+import { Theme } from "./Themes";
 
 interface MarkedList { 
   [key: string]: {
@@ -23,7 +24,7 @@ const generateMarkedList = (meditations: MeditationMap): MarkedList => {
 
     const dot = {
       key: '0',
-      color: '#00a8c9',
+      color: Theme.colors.dot,
       selectedDotColor: 'white',
     }
 
@@ -72,6 +73,12 @@ const filterMeditationMap = (
   return result;
 }
 
+const generateMeditationTitle = (meditation: Meditation) => {
+  const date = new Date(meditation.key);
+
+  return `${date.toLocaleString('en-US', {dateStyle: 'full', timeStyle: 'short'})}`
+}
+
 export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Log'> ) => {
   const {state, dispatch} = useContext(DispatchContext);
   const monthMeditations = useState<MeditationMap>(state.meditations)
@@ -80,57 +87,81 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
     filterMeditationMap(state.meditations, new Date(Date.now()).getMonth())
   )
 
-  const renderItem: ListRenderItem<string> = ({item}) => {
+  const renderItem: ListRenderItem<string> = ({ item }) => {
     const meditation: Meditation = monthMeditations[0][item];
     
     return (
       <TouchableHighlight
-        onPress={() => navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.LOG })}
+        underlayColor={'#FFFFFF44'}
+        onPress={ () => navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.LOG })}
       >
-        <Text>{meditation.key}</Text>
+        <Text style={{
+          fontSize: 16,
+        }}>{ 
+          generateMeditationTitle(meditation) 
+        }</Text>
       </TouchableHighlight>
     )
   }
   
   return (
-    <View style={styles.container}>
-      <Text>A monthly calendar with meditation days highlighted and you can click them to read your log. Also a list in reverse chronological order</Text>
-      <Calendar 
-        maxDate={new Date().toUTCString()}
-        markingType={'multi-dot'}
-        markedDates={monthMeditationsML[0]}
-        onDayPress={(selectedDate) => {
-          const filteredMap = filterMeditationMap(monthMeditations[0], selectedDate.month - 1, selectedDate.day)
-          setFilteredMeditationMap(filteredMap);
-        }}
-        onMonthChange={async (date) => {
-          monthMeditations[0] = await Persister.getMeditationMonthList(date.month);
-          
-          if(!monthMeditations[0])
-            return;
+    <View style={ Theme.styles.container }>
+      <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>
 
-          monthMeditationsML[0] = generateMarkedList(monthMeditations[0]);
-          setFilteredMeditationMap(
-            filterMeditationMap(monthMeditations[0], date.month)
-          );
-        }}
-      />
-      <FlatList 
-        data={Object.keys(filteredMeditationMap)}
-        renderItem={renderItem}
-      />
-      
+        <Calendar     
+          maxDate={ new Date().toUTCString() }
+          markingType={ 'multi-dot' }
+          markedDates={ monthMeditationsML[0] }
+
+          onDayPress={ ( selectedDate ) => {
+            const filteredMap = filterMeditationMap(monthMeditations[0], selectedDate.month - 1, selectedDate.day)
+            setFilteredMeditationMap(filteredMap);
+          }}
+
+          onMonthChange={ async ( date ) => {
+            monthMeditations[0] = await Persister.getMeditationMonthList(date.month);
+            
+            if( !monthMeditations[0] )
+              return;
+
+            monthMeditationsML[0] = generateMarkedList(monthMeditations[0]);
+            setFilteredMeditationMap(
+              filterMeditationMap(monthMeditations[0], date.month)
+            );
+          }}
+
+          style={{
+            backgroundColor: Theme.colors.card,
+          }}
+
+          theme={{
+            backgroundColor: Theme.colors.card,
+            calendarBackground: Theme.colors.card,
+            textSectionTitleColor: 'black',
+            arrowColor: 'black',
+            textDisabledColor: '#8f8f8fff',
+            selectedDayBackgroundColor: Theme.colors.dot,
+          }}
+        />
+
+        <Text style={{
+          marginHorizontal: 10, marginTop: 10, paddingBottom: 0, fontSize: 20 
+        }}>
+          Meditations
+        </Text>
+        <FlatList 
+          style={ Theme.styles.card }
+          data={ Object.keys(filteredMeditationMap) }
+          renderItem={ renderItem }
+        />
+
+      </ImageBackground>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+
 });
 
 export { Meditation };
