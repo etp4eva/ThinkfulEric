@@ -97,7 +97,7 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
   const monthMeditationsML = useState<MarkedList>(generateMarkedList(state.meditations));
 
   const today: Date = new Date();
-  const [filteredMeditationMap, setFilteredMeditationMap] = useState<MeditationMap>(
+  const [filteredMeditationMap, setFilteredMeditationMap] = useState<MeditationMap|undefined>(
     filterMeditationMap(state.meditations, today.getMonth())
   )
   const [filterTitle, setFilterTitle] = useState<string>(
@@ -141,7 +141,10 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
             setFilterTitle(generateFilterTitle(date.year, date.month-1));
             
             if( !monthMeditations[0] )
+            {
+              setFilteredMeditationMap(undefined);
               return;
+            }
 
             monthMeditationsML[0] = generateMarkedList(monthMeditations[0]);
             setFilteredMeditationMap(
@@ -179,7 +182,11 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
 
         <FlatList 
           style={ Theme.styles.card }
-          data={ Object.keys(filteredMeditationMap) }
+          data={ 
+            (filteredMeditationMap) 
+              ? Object.keys(filteredMeditationMap)
+              : undefined                
+          }
           renderItem={ renderItem }
         />
 
