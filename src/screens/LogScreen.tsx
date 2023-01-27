@@ -87,8 +87,6 @@ const generateFilterTitle = (year: number, month: number, day?: number) => {
 
   const dayString = (day !== undefined) ? `${day} ` : '';
   const result = `${dayString}${monthNames[month]}, ${year}`;
-  console.log(`${year} ${month} ${day}`)
-  console.log(result);
 
   return result;
 }
@@ -105,8 +103,6 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
   const [filterTitle, setFilterTitle] = useState<string>(
     generateFilterTitle(today.getFullYear(), today.getMonth())
   );
-
-  console.log(today.getMonth())
 
   const renderItem: ListRenderItem<string> = ({ item }) => {
     const meditation: Meditation = monthMeditations[0][item];
@@ -141,8 +137,7 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
           }}
 
           onMonthChange={ async ( date ) => {
-            monthMeditations[0] = await Persister.getMeditationMonthList(date.year, date.month);
-
+            monthMeditations[0] = await Persister.getMeditationMonthList(date.year, date.month-1);
             setFilterTitle(generateFilterTitle(date.year, date.month-1));
             
             if( !monthMeditations[0] )
@@ -150,7 +145,7 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
 
             monthMeditationsML[0] = generateMarkedList(monthMeditations[0]);
             setFilteredMeditationMap(
-              filterMeditationMap(monthMeditations[0], date.month)
+              filterMeditationMap(monthMeditations[0], date.month - 1)
             );
           }}
 
