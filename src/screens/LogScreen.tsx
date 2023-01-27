@@ -74,9 +74,27 @@ const filterMeditationMap = (
 }
 
 const generateMeditationTitle = (meditation: Meditation) => {
+  const monthNames = [
+    "Jan", "Feb", "March", "April", "May", "June",
+    "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+  ];
+
+  const dayNames = [
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+  ];
+
   const date = new Date(meditation.key);
 
-  return `${date.toLocaleString('en-US', {dateStyle: 'full', timeStyle: 'short'})}`
+  const dateString = `${dayNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]}`;
+  const timeString = `${date.getHours()}:${date.getMinutes()}`;
+  const minutes = `${Math.floor(meditation.timeElapsed / 60000)} mins`;
+
+  return {
+    date: dateString, 
+    time: timeString, 
+    minutes: minutes, 
+    dateTime: `${dateString} - ${timeString}`,
+  };
 }
 
 const generateFilterTitle = (year: number, month: number, day?: number) => {
@@ -107,17 +125,21 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
 
   const renderItem: ListRenderItem<string> = ({ item }) => {
     const meditation: Meditation = monthMeditations[0][item];
+    const meditationTitle = generateMeditationTitle(meditation);
     
     return (
       <TouchableHighlight
         underlayColor={'#FFFFFF44'}
         onPress={ () => navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.LOG })}
       >
-        <Text style={{
-          fontSize: 16,
-        }}>{ 
-          generateMeditationTitle(meditation) 
-        }</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={{fontSize: 16}}>
+            {meditationTitle.dateTime}
+          </Text>
+          <Text style={{fontSize: 16}}>
+            {meditationTitle.minutes}
+          </Text>
+        </View>
       </TouchableHighlight>
     )
   }
