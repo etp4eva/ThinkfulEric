@@ -3,6 +3,7 @@ import { Chime } from "./ChimePlayer";
 export type Meditation = {
     key: string;
     timestamp: number;
+    year: number;
     month: number;
     markString: string;
 
@@ -34,7 +35,8 @@ export const createBaseMeditation = (
     let m: Meditation = {
         key: timestamp.toISOString(),
         timestamp: timestamp.getTime(),
-        month: timestamp.getMonth(),
+        year: timestamp.getFullYear(),
+        month: timestamp.getMonth(),        
         markString: getFormattedDateString(timestamp),
         chimes: chimes,
         timeElapsed: timeElapsed,

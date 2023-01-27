@@ -8,10 +8,14 @@ enum KeyPrefixes {
     MEDITATION_SETTINGS = '@CURRENT_MEDITATION',
 }
 
+const generateMonthKey = (year: number, month: number) => {
+    return KeyPrefixes.MONTH_MEDITATION_LIST_ + `${year}_${month}`;
+}
+
 export class Persister {    
-    static getMeditationMonthList = async (month: number) => {
+    static getMeditationMonthList = async (year: number, month: number) => {
         try {
-            const monthKey = KeyPrefixes.MONTH_MEDITATION_LIST_ + month;
+            const monthKey = generateMonthKey(year, month);
             
             const mListJSON = await AsyncStorage.getItem(monthKey);
             
@@ -43,14 +47,12 @@ export class Persister {
     static updateSavedMeditation = async (meditation: Meditation): Promise<MeditationMap> => {        
 
         return new Promise<MeditationMap>(async (resolve) => {
-            console.log('gwarsh1');
-            const monthKey = KeyPrefixes.MONTH_MEDITATION_LIST_ + meditation.month;
+            const monthKey = generateMonthKey(meditation.year, meditation.month);
 
             try {          
                 const mListJSON = await AsyncStorage.getItem(monthKey);
-                console.log('gwarsh2');
                 let meditationList: MeditationMap = mListJSON != null ? JSON.parse(mListJSON) : null;                
-                console.log('gwarsh3');
+
                 if (meditationList !== null) {
                     meditationList[meditation.key] = meditation;
                 } else {
@@ -68,7 +70,7 @@ export class Persister {
     }
 
     static deleteSavedMeditation = async (meditation: Meditation) => {
-        const monthKey = KeyPrefixes.MONTH_MEDITATION_LIST_ + meditation.month;
+        const monthKey = generateMonthKey(meditation.year, meditation.month);
 
         try {
             const mListJSON = await AsyncStorage.getItem(monthKey);

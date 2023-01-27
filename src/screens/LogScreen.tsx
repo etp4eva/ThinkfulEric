@@ -79,13 +79,34 @@ const generateMeditationTitle = (meditation: Meditation) => {
   return `${date.toLocaleString('en-US', {dateStyle: 'full', timeStyle: 'short'})}`
 }
 
+const generateFilterTitle = (year: number, month: number, day?: number) => {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const dayString = (day !== undefined) ? `${day} ` : '';
+  const result = `${dayString}${monthNames[month]}, ${year}`;
+  console.log(`${year} ${month} ${day}`)
+  console.log(result);
+
+  return result;
+}
+
 export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Log'> ) => {
   const {state, dispatch} = useContext(DispatchContext);
-  const monthMeditations = useState<MeditationMap>(state.meditations)
-  const monthMeditationsML = useState<MarkedList>(generateMarkedList(state.meditations))
+  const monthMeditations = useState<MeditationMap>(state.meditations);
+  const monthMeditationsML = useState<MarkedList>(generateMarkedList(state.meditations));
+
+  const today: Date = new Date();
   const [filteredMeditationMap, setFilteredMeditationMap] = useState<MeditationMap>(
-    filterMeditationMap(state.meditations, new Date(Date.now()).getMonth())
+    filterMeditationMap(state.meditations, today.getMonth())
   )
+  const [filterTitle, setFilterTitle] = useState<string>(
+    generateFilterTitle(today.getFullYear(), today.getMonth())
+  );
+
+  console.log(today.getMonth())
 
   const renderItem: ListRenderItem<string> = ({ item }) => {
     const meditation: Meditation = monthMeditations[0][item];
@@ -113,13 +134,16 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
           markingType={ 'multi-dot' }
           markedDates={ monthMeditationsML[0] }
 
-          onDayPress={ ( selectedDate ) => {
-            const filteredMap = filterMeditationMap(monthMeditations[0], selectedDate.month - 1, selectedDate.day)
+          onDayPress={ ( date ) => {
+            const filteredMap = filterMeditationMap(monthMeditations[0], date.month - 1, date.day)
+            setFilterTitle(generateFilterTitle(date.year, date.month-1, date.day));
             setFilteredMeditationMap(filteredMap);
           }}
 
           onMonthChange={ async ( date ) => {
-            monthMeditations[0] = await Persister.getMeditationMonthList(date.month);
+            monthMeditations[0] = await Persister.getMeditationMonthList(date.year, date.month);
+
+            setFilterTitle(generateFilterTitle(date.year, date.month-1));
             
             if( !monthMeditations[0] )
               return;
@@ -144,11 +168,20 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
           }}
         />
 
-        <Text style={{
-          marginHorizontal: 10, marginTop: 10, paddingBottom: 0, fontSize: 20 
+        <View style={{
+          flexDirection: 'row', 
+          alignItems: 'baseline', 
+          justifyContent:'space-between',
+          marginHorizontal: 10,
         }}>
-          Meditations
-        </Text>
+          <Text style={{
+            marginTop: 10, paddingBottom: 0, fontSize: 20 
+          }}>
+            Meditations
+          </Text>
+          <Text style={{fontStyle: 'italic'}}>{filterTitle}</Text>
+        </View>
+
         <FlatList 
           style={ Theme.styles.card }
           data={ Object.keys(filteredMeditationMap) }

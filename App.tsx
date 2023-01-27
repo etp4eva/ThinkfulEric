@@ -14,6 +14,7 @@ import { DispatchContext } from './src/contexts/Context';
 import { Theme } from './src/screens/Themes';
 import { Persister } from './src/types/Persister';
 import { Chime } from './src/types/ChimePlayer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -22,20 +23,23 @@ export default function App() {
 
   React.useEffect(() => {
     const checkAsync = async () => {
-        const settings: Chime[] = await Persister.getSettings();
-        const meditations: MeditationMap = await Persister.getMeditationMonthList(new Date().getMonth());
+      const today: Date = new Date();
+      const settings: Chime[] = await Persister.getSettings();
+      const meditations: MeditationMap = await Persister.getMeditationMonthList(
+        today.getFullYear(), today.getMonth()
+      );
 
-        if (settings) {
-          dispatch({type: Types.INIT_SETTINGS, payload: settings});
-        }
+      if (settings) {
+        dispatch({type: Types.INIT_SETTINGS, payload: settings});
+      }
 
-        if (meditations) {
-          dispatch({type: Types.INIT_MEDITATIONS, payload: meditations});
-        }
+      if (meditations) {
+        dispatch({type: Types.INIT_MEDITATIONS, payload: meditations});
+      }
     }
     checkAsync()
   }, [])
-  
+
   return (
     <DispatchContext.Provider value={{state, dispatch}}>
       <NavigationContainer>
