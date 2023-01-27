@@ -1,6 +1,6 @@
 import { StackScreenProps } from "@react-navigation/stack"
 import { useContext, useState } from "react";
-import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, ListRenderItem, TouchableHighlight, ImageBackground, ActivityIndicator } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { FlatList } from "react-native-gesture-handler";
 import { DispatchContext } from "../contexts/Context";
@@ -103,6 +103,7 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
   const [filterTitle, setFilterTitle] = useState<string>(
     generateFilterTitle(today.getFullYear(), today.getMonth())
   );
+  const [isListLoading, setIsListLoading] = useState(false);
 
   const renderItem: ListRenderItem<string> = ({ item }) => {
     const meditation: Meditation = monthMeditations[0][item];
@@ -120,6 +121,30 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
       </TouchableHighlight>
     )
   }
+
+  const renderList = () => {
+    if (isListLoading) {
+      return (
+        <ActivityIndicator
+          size='large'
+          color={Theme.colors.dot}
+        />
+      )
+    } else if (filteredMeditationMap) {
+      return (
+        <FlatList 
+          data={Object.keys(filteredMeditationMap)}
+          renderItem={ renderItem }
+        />
+      )
+    } else {
+      return (
+        <Text style={{textAlign:'center', fontStyle:'italic'}}>
+          No meditations found
+        </Text>
+      )
+    }
+  }
   
   return (
     <View style={ Theme.styles.container }>
@@ -131,25 +156,34 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
           markedDates={ monthMeditationsML[0] }
 
           onDayPress={ ( date ) => {
+            setIsListLoading(true);
             const filteredMap = filterMeditationMap(monthMeditations[0], date.month - 1, date.day)
             setFilterTitle(generateFilterTitle(date.year, date.month-1, date.day));
-            setFilteredMeditationMap(filteredMap);
+
+            if (Object.keys(filteredMap).length !== 0) {
+              setFilteredMeditationMap(filteredMap);
+            } else {
+              setFilteredMeditationMap(undefined);
+            }
+
+            setIsListLoading(false);
           }}
 
           onMonthChange={ async ( date ) => {
+            setIsListLoading(true);
             monthMeditations[0] = await Persister.getMeditationMonthList(date.year, date.month-1);
             setFilterTitle(generateFilterTitle(date.year, date.month-1));
             
             if( !monthMeditations[0] )
             {
-              setFilteredMeditationMap(undefined);
-              return;
+              setFilteredMeditationMap(undefined);              
+            } else {
+              monthMeditationsML[0] = generateMarkedList(monthMeditations[0]);
+              setFilteredMeditationMap(
+                filterMeditationMap(monthMeditations[0], date.month - 1)
+              );
             }
-
-            monthMeditationsML[0] = generateMarkedList(monthMeditations[0]);
-            setFilteredMeditationMap(
-              filterMeditationMap(monthMeditations[0], date.month - 1)
-            );
+            setIsListLoading(false);
           }}
 
           style={{
@@ -179,16 +213,10 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
           </Text>
           <Text style={{fontStyle: 'italic'}}>{filterTitle}</Text>
         </View>
-
-        <FlatList 
-          style={ Theme.styles.card }
-          data={ 
-            (filteredMeditationMap) 
-              ? Object.keys(filteredMeditationMap)
-              : undefined                
-          }
-          renderItem={ renderItem }
-        />
+        
+        <View style={ Theme.styles.card }>
+          {renderList()}
+        </View>
 
       </ImageBackground>
     </View>
