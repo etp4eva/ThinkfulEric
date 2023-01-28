@@ -207,7 +207,7 @@ const EditMode = (
 
     let stressAfter = (
         <CustomSlider 
-            defaultValue={meditation.stressBefore ? meditation.stressBefore : 0} 
+            defaultValue={meditation.stressAfter ? meditation.stressAfter : 0} 
             title={'Stress After:'} 
             labels={stressLevels}
             numLevels={5}
