@@ -1,7 +1,10 @@
+import { DefaultTheme } from "@react-navigation/native"
 import { StyleSheet } from "react-native"
 
 export const Theme = {
+    ...DefaultTheme,
     colors: {
+      ...DefaultTheme.colors,
       primary: '#adba94ff',
       background: '#adba94ff',
       dot: '#6c906dff',
@@ -9,7 +12,7 @@ export const Theme = {
       text: '#171a12',
       border: '#90ad87ff',
       notification: '#b3b8ab',
-      headerTint: '#223221ff',
+      headerTint: '#90ad87ff',
     },
     images: {
       background: require('../../assets/img/monstera.png'),

@@ -1,20 +1,36 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import { MeditationInfoMode, RootStackParamList } from './ScreenParams';
-import { Button, Text, View, StyleSheet, TextInput } from 'react-native'
+import { Button, Text, View, StyleSheet, TextInput, ImageBackground } from 'react-native'
 import { useContext, useState } from 'react';
 import { DispatchContext } from '../contexts/Context';
 import { Meditation } from './LogScreen';
 import { actionCreators } from '../reducers/MeditationReducer';
 import { FlatList } from 'react-native-gesture-handler';
 import Slider from '@react-native-community/slider';
+import { generateMeditationTitle } from '../types/types';
+import { Theme } from './Themes';
+import { ImageButton } from '../components/ImageButton';
 
-const stressLevels = [
-    'N/A', 'Serene', 'Relaxed', 'Normal', 'Uneasy', 'Stressed'
+const stress = [
+    ['N/A', '✖️'], 
+    ['Serene', '🧘'], 
+    ['Relaxed', '😌'],
+    ['Normal',  '😑'],
+    ['Uneasy',  '😣'],
+    ['Stressed', '😫'],
 ]
 
-const depthLevels = [
-    'N/A', 'Many Thoughts', 'Some Thoughts', 'Few thoughts', 'No Thoughts'
-]
+const stressLevels = stress.map((val) => {return val[0]});
+
+const depth = [
+    ['N/A', '✖️'],
+    ['Many Thoughts', '📢'], 
+    ['Some Thoughts', '🔊'], 
+    ['Few thoughts', '🔉'], 
+    ['No Thoughts', '🔈']
+];
+
+const depthLevels = depth.map((val) => {return val[0]});
 
 const interruptionLevels = [
     'N/A', 'Once', 'Twice', 'Frequently'
@@ -37,96 +53,172 @@ const ReadMode = (
     let location;
     let stressBefore;
     let stressAfter;
-    let depth;
+    let depthCom;
+    let feelingsCombo;
     let interrupted;
-
-    if (meditation.log) {
-        log = (
-            <View>
-                <Text>Log:</Text>
-                <Text>{meditation.log}</Text>
-            </View>
-        )
-    }
 
     if (meditation.location) {
         location = (
             <View>
-                <Text>Location:</Text>
-                <Text>{meditation.location}</Text>
+                <Text style={ styles.sectionHeader }>Location</Text>
+                <View style={ Theme.styles.card }>
+                    <Text style={{fontSize: 15}}>
+                        {meditation.location}
+                    </Text>
+                </View>
+            </View>
+        )
+    }
+
+    if (meditation.log) {
+        log = (
+            <View>
+                <Text style={ styles.sectionHeader }>Log</Text>
+                <View style={ Theme.styles.card }>
+                    <Text style={{fontSize: 15}}>
+                        { meditation.log }
+                    </Text>
+                </View>
             </View>
         )
     }
 
     if (meditation.stressBefore) {
         stressBefore = (
-            <View>
-                <Text>Stress Before:</Text>
-                <Text>{stressLevels[meditation.stressBefore]}</Text>
+            <View style={ styles.rowItems }>
+                <Text style={ styles.centeredHeader }>Stress Before</Text>
+                <View style={ styles.rowCard }>
+                    <Text style={ styles.emojiScale }>
+                        { stress[meditation.stressBefore][1] }
+                    </Text>
+                    <Text style={ styles.dataItemText }>
+                        { stress[meditation.stressBefore][0] }
+                    </Text>                    
+                </View>
             </View>
         )
     }
 
     if (meditation.stressAfter) {
         stressAfter = (
-            <View>
-                <Text>Stress After:</Text>
-                <Text>{stressLevels[meditation.stressAfter]}</Text>
+            <View style={ styles.rowItems }>
+                <Text style={ styles.centeredHeader }>Stress After</Text>
+                <View style={ styles.rowCard }>
+                    <Text style={ styles.emojiScale }>
+                        { stress[meditation.stressAfter][1] }
+                    </Text>
+                    <Text style={ styles.dataItemText }>
+                        { stress[meditation.stressAfter][0] }
+                    </Text>                    
+                </View>
             </View>
         )
-    }
+    }    
 
     if (meditation.depth) {
-        depth = (
-            <View>
-                <Text>Depth:</Text>
-                <Text>{depthLevels[meditation.depth]}</Text>
+        depthCom = (
+            <View style={ styles.rowItems }>
+                <Text style={ styles.centeredHeader }>Depth</Text>
+                <View style={ styles.rowCard }>                    
+                    <Text style={ styles.emojiScale }>
+                        { depth[meditation.depth][1] }
+                    </Text>
+                    <Text style={ styles.dataItemText }>
+                        { depth[meditation.depth][0] }                        
+                    </Text>                    
+                </View>
             </View>
         )
-    }
+    }        
 
     if (meditation.interrupted) {
         interrupted = (
-            <View>
-                <Text>Interrupted:</Text>
-                <Text>{interruptionLevels[meditation.interrupted]}</Text>
+            <View style={ styles.rowItems }>
+                <Text style={ styles.centeredHeader }>Interrupted</Text>
+                <View style={ styles.rowCard }>
+                    <Text style={ styles.dataItemText }>
+                        {interruptionLevels[meditation.interrupted]}
+                    </Text>
+                </View>
             </View>
         )
     }
 
+    const timeElapsed = (
+        <View style={ styles.rowItems }>            
+            <Text style={ styles.centeredHeader }>Time Elapsed</Text>
+            <View style={ styles.rowCard }>
+                <Text style={ styles.dataItemText }>
+                    {minSec.minutes}m {minSec.seconds.toString().padStart(2,'0')}s
+                </Text>
+            </View>
+        </View>
+    );
+
+    if ( stressBefore || stressAfter || depthCom )
+    {
+        feelingsCombo = (
+            <View style={ styles.rowContainer }>
+                { stressBefore }
+                { stressAfter }
+                { depthCom }
+            </View>
+        )
+    }
+
+    const interruptTimeCombo = (
+        <View style={ styles.rowContainer }>
+            { interrupted }
+            { timeElapsed }
+        </View>
+    );
+
     return (
-        <View>
-            <View>
-                <Text>{meditation.key}</Text>
-            </View>
-            {location}            
-            {log}
-            {stressBefore}
-            {stressAfter}
-            {depth}
-            {interrupted}
-            <View>
-                <Text>Time Elapsed:</Text>
-                <Text>{minSec.minutes}:{minSec.seconds.toString().padStart(2,'0')}</Text>
-            </View>
-            <View>
-                <Text>Chimes:</Text>
-                <FlatList
-                    data={meditation.chimes}
-                    renderItem={({item}) => {
-                        return (
-                          <View>
-                            <Text>{item.labels[0]}</Text>
-                            <Text>{item.labels[1]}</Text>
-                          </View>
-                        )
-                    }}
+        <View style={ Theme.styles.container }>
+            <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>
+                <View>
+                    <Text style={styles.title}>
+                        { generateMeditationTitle(meditation).dateTime }
+                    </Text>
+                </View>
+
+                { location }
+                { log }
+                { feelingsCombo }
+                { interruptTimeCombo }
+                
+                <View>
+                    <Text style={ styles.sectionHeader }>Chimes</Text>
+                    <View style={ Theme.styles.card }>
+                        <FlatList
+                            data={meditation.chimes}
+                            renderItem={({item}) => {
+                                return (
+                                    <View style={{ 
+                                        flexDirection: 'row', 
+                                        justifyContent: 'space-between',
+                                    }}>
+                                        <Text style={ styles.dataItemText }>
+                                            {item.labels[1]}
+                                        </Text>
+                                        <Text style={ styles.dataItemText }>
+                                            {item.labels[0]}
+                                        </Text>
+                                    </View>
+                                )
+                            }}
+                        />
+                    </View>
+                </View>
+    
+                <ImageButton
+                    imageStyle={{ width: 100, height: undefined, aspectRatio: 1.8 }}
+                    textStyle={{ fontSize: 18 }}
+                    label='Edit log'
+                    image={Theme.images.lotusButton}
+                    onPress={() => { setEditing(true); }}
                 />
-            </View>
-            <Button
-                title='Edit log'
-                onPress={() => { setEditing(true); }}
-            />
+            </ImageBackground>
         </View>
     )
 }
@@ -332,4 +424,50 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
     },
+
+    title: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        paddingTop: 10,
+    },
+
+    sectionHeader: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        paddingLeft: 10,
+        marginBottom: -10,
+    },
+
+    centeredHeader: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+
+    rowContainer: {
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        alignContent: 'stretch',
+        paddingBottom: 5, 
+    },
+
+    rowItems: {
+        paddingHorizontal: 10,
+        flexGrow: 1,
+    },
+
+    rowCard: {
+        padding: 5,
+        backgroundColor: Theme.colors.card,
+        alignItems: 'center',
+    },
+
+    emojiScale: {
+        fontSize: 30,
+    },
+
+    dataItemText: {
+        fontSize: 20,
+    }
 });

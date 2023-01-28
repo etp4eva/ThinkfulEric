@@ -69,20 +69,31 @@ export default function App() {
 
     return (
       <DispatchContext.Provider value={{state, dispatch}}>
-        <NavigationContainer>
+        <NavigationContainer theme={Theme}>
           <RootStack.Navigator initialRouteName='Home' >
             <RootStack.Screen 
               name='Home' 
               component={HomeScreen} 
               options={Theme.headerOptions}
             />
-            <RootStack.Screen name='Meditate' component={MeditateScreen}/>
+            <RootStack.Screen 
+              name='Meditate' 
+              component={MeditateScreen}
+              options={Theme.headerOptions}
+            />
             <RootStack.Screen 
               name='Log'
               component={LogScreen}
               options={Theme.headerOptions}
             />
-            <RootStack.Screen name='MeditationInfo' component={MediationInfoScreen} />
+            <RootStack.Screen 
+              name='MeditationInfo' 
+              component={MediationInfoScreen} 
+              options={{
+                ...Theme.headerOptions,
+                title: 'Meditation Info',
+              }}
+            />
           </RootStack.Navigator>
         </NavigationContainer>
       </DispatchContext.Provider>

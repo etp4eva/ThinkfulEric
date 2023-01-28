@@ -5,7 +5,7 @@ import { Calendar } from "react-native-calendars";
 import { FlatList } from "react-native-gesture-handler";
 import { DispatchContext } from "../contexts/Context";
 import { MeditationMap } from "../reducers/MeditationReducer";
-import { Meditation, MeditationMarker } from "../types/types";
+import { Meditation, MeditationMarker, generateMeditationTitle } from "../types/types";
 import { MeditationInfoMode, RootStackParamList } from "./ScreenParams";
 import { Persister } from "../types/Persister";
 import { Theme } from "./Themes";
@@ -71,30 +71,6 @@ const filterMeditationMap = (
   })
 
   return result;
-}
-
-const generateMeditationTitle = (meditation: Meditation) => {
-  const monthNames = [
-    "Jan", "Feb", "March", "April", "May", "June",
-    "July", "Aug", "Sept", "Oct", "Nov", "Dec"
-  ];
-
-  const dayNames = [
-    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-  ];
-
-  const date = new Date(meditation.key);
-
-  const dateString = `${dayNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]}`;
-  const timeString = `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-  const minutes = `${Math.floor(meditation.timeElapsed / 60000)} mins`;
-
-  return {
-    date: dateString, 
-    time: timeString, 
-    minutes: minutes, 
-    dateTime: `${dateString} - ${timeString}`,
-  };
 }
 
 const generateFilterTitle = (year: number, month: number, day?: number) => {
