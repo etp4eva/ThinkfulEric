@@ -28,10 +28,10 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
               }}
             />
 
-            <View style={ styles.titleView }>
+            <View style={ Theme.styles.titleView }>
               <View style={{ alignItems:'center' }}>
-                <Text style={ styles.title }>ThinkfulEric</Text>
-                <Text style={ styles.subtitle }>Meditation by Eric</Text>            
+                <Text style={ Theme.styles.title }>ThinkfulEric</Text>
+                <Text style={ Theme.styles.subtitle }>Meditation by Eric</Text>            
               </View>
             </View>
 
@@ -74,20 +74,7 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
 }
 
 const styles = StyleSheet.create({
-    titleView: {
-      alignItems: 'center',
-      flexGrow: 1,
-      justifyContent: 'space-around'
-    },
-    title: {
-      fontSize: 60,
-      paddingBottom: 5
-    },
-    subtitle: {
-      fontSize: 20,
-      //fontStyle: "italic", 
-      marginTop: -20,
-    },
+
     buttonsView: {
       flexDirection: 'row',
       justifyContent: 'space-around',

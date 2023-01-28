@@ -43,5 +43,19 @@ export const Theme = {
         padding: 10,
         flexGrow: 0,
       },
+      titleView: {
+        alignItems: 'center',
+        flexGrow: 1,
+        justifyContent: 'space-around'
+      },
+      title: {
+        fontSize: 60,
+        paddingBottom: 5
+      },
+      subtitle: {
+        fontSize: 20,
+        //fontStyle: "italic", 
+        marginTop: -20,
+      },
     })
   }
