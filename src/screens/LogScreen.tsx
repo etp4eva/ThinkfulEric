@@ -86,7 +86,7 @@ const generateMeditationTitle = (meditation: Meditation) => {
   const date = new Date(meditation.key);
 
   const dateString = `${dayNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]}`;
-  const timeString = `${date.getHours()}:${date.getMinutes()}`;
+  const timeString = `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
   const minutes = `${Math.floor(meditation.timeElapsed / 60000)} mins`;
 
   return {
@@ -193,8 +193,8 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
 
           onMonthChange={ async ( date ) => {
             setIsListLoading(true);
-            monthMeditations[0] = await Persister.getMeditationMonthList(date.year, date.month-1);
             setFilterTitle(generateFilterTitle(date.year, date.month-1));
+            monthMeditations[0] = await Persister.getMeditationMonthList(date.year, date.month-1);            
             
             if( !monthMeditations[0] )
             {
