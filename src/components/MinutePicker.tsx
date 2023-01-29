@@ -28,7 +28,7 @@ export const MinutePicker = (props: MinutePickerProps) => {
         const len: number = lowNum < 10 ? lowNum : 9;
 
         const earlierNumbers = Array.from({length: len}, (_, i) => lowNum - len + i);
-        console.log(earlierNumbers)
+
         setState(
             earlierNumbers.concat(state)
         ); 
