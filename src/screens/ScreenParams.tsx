@@ -4,6 +4,7 @@ export enum MeditationInfoMode {
   PRE_MED = 'PRE_MED',
   POST_MED = 'POST_MED',
   LOG = 'LOG',
+  EDIT = 'EDIT',
 }
 
 export type RootStackParamList = {

@@ -101,6 +101,9 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
 
   const renderItem: ListRenderItem<string> = ({ item }) => {
     const meditation: Meditation = monthMeditations[0][item];
+
+    if (!meditation) return null;
+    
     const meditationTitle = generateMeditationTitle(meditation);
     
     return (

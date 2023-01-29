@@ -1,7 +1,7 @@
-import { StackScreenProps } from '@react-navigation/stack';
+import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
 import { MeditationInfoMode, RootStackParamList } from './ScreenParams';
 import { Button, Text, View, StyleSheet, TextInput, ImageBackground } from 'react-native'
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { DispatchContext } from '../contexts/Context';
 import { Meditation } from './LogScreen';
 import { actionCreators } from '../reducers/MeditationReducer';
@@ -45,7 +45,7 @@ const calculateMinSec = (milliseconds: number) => {
 
 const ReadMode = (
     meditation: Meditation,
-    setEditing: (edit: boolean) => void
+    navigation: StackNavigationProp<RootStackParamList, "MeditationInfo", undefined>,
 ) => {
     const minSec = calculateMinSec(meditation.timeElapsed);
 
@@ -216,7 +216,7 @@ const ReadMode = (
                     textStyle={{ fontSize: 18 }}
                     label='Edit log'
                     image={Theme.images.lotusButton}
-                    onPress={() => { setEditing(true); }}
+                    onPress={() => { navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.EDIT }) }}
                 />
             </ImageBackground>
         </View>
@@ -259,15 +259,13 @@ const EditMode = (
     dispatch: React.Dispatch<any>,
     {route, navigation}: StackScreenProps<RootStackParamList, 'MeditationInfo'>
 ) => {
-    let newMeditation: Meditation = JSON.parse(JSON.stringify(meditation))
-
     let log = (
         <View>
             <Text>Log:</Text>
             <TextInput
                     multiline
                     numberOfLines={10}
-                    onChangeText={(text) => {newMeditation.log = text}}
+                    onChangeText={(text) => {meditation.log = text}}
                 >
                     {meditation.log}
             </TextInput>
@@ -278,7 +276,7 @@ const EditMode = (
         <View>
             <Text>Location:</Text>
             <TextInput
-                onChangeText={(text) => {newMeditation.location = text}}
+                onChangeText={(text) => {meditation.location = text}}
             >
                 {meditation.location}
             </TextInput>
@@ -292,7 +290,7 @@ const EditMode = (
             labels={stressLevels} 
             numLevels={5}
             onUpdate={(value: number) => {
-                newMeditation.stressBefore = value === 0 ? undefined : value;
+                meditation.stressBefore = value === 0 ? undefined : value;
             }}
         />
     );
@@ -304,7 +302,7 @@ const EditMode = (
             labels={stressLevels}
             numLevels={5}
             onUpdate={(value: number) => {
-                newMeditation.stressAfter = value === 0 ? undefined : value;
+                meditation.stressAfter = value === 0 ? undefined : value;
             }}
         />
     );
@@ -316,7 +314,7 @@ const EditMode = (
             labels={depthLevels}
             numLevels={4}
             onUpdate={(value: number) => {
-                newMeditation.depth = value === 0 ? undefined : value;
+                meditation.depth = value === 0 ? undefined : value;
             }}
         />
     );
@@ -328,7 +326,7 @@ const EditMode = (
             labels={interruptionLevels}
             numLevels={3}
             onUpdate={(value: number) => {
-                newMeditation.interrupted = value === 0 ? undefined : value;
+                meditation.interrupted = value === 0 ? undefined : value;
             }}
         />
     )
@@ -337,8 +335,8 @@ const EditMode = (
         <Button
             title='Start Meditation'
             onPress={() => {
-                dispatch(actionCreators.updateMeditation(newMeditation));
-                navigation.replace('Meditate', {meditation: newMeditation});
+                dispatch(actionCreators.updateMeditation(meditation));
+                navigation.replace('Meditate', {meditation: meditation});
             }}
         />
     )
@@ -356,11 +354,13 @@ const EditMode = (
         <Button
             title='Save changes'
             onPress={() => { 
-                dispatch(actionCreators.updateMeditation(newMeditation))
-                setEditing(false); 
+                dispatch(actionCreators.updateMeditation(meditation))
+
                 if (mode === MeditationInfoMode.POST_MED)
                 {
                     navigation.popToTop();
+                } if (mode === MeditationInfoMode.EDIT) {
+                    navigation.pop();
                 }
             }}
         />
@@ -369,7 +369,7 @@ const EditMode = (
     let discardChangesButton = (
         <Button
             title='Discard changes'
-            onPress={() => { setEditing(false); }}
+            onPress={() => { navigation.pop(); }}
         />
     )
 
@@ -378,7 +378,12 @@ const EditMode = (
             title='Delete meditation'
             onPress={() => { 
                 dispatch(actionCreators.deleteMeditation(meditation));
-                navigation.pop();
+                if (mode === MeditationInfoMode.POST_MED)
+                {
+                    navigation.popToTop();
+                } if (mode === MeditationInfoMode.EDIT) {
+                    navigation.navigate('Log');
+                }
             }}
         />
     )
@@ -411,11 +416,25 @@ export const MediationInfoScreen = ({ route, navigation }: StackScreenProps<Root
     const {state, dispatch} = useContext(DispatchContext);
 
     const [isEditing, setEditing] = useState(route.params.mode !== MeditationInfoMode.LOG);
+
+    let newMeditation: Meditation = route.params.meditation;
+
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            if (newMeditation.key in state.meditations) {
+                newMeditation = JSON.parse(JSON.stringify(state.meditations[newMeditation.key]));
+            } else {
+                newMeditation = JSON.parse(JSON.stringify(route.params.meditation));
+            }
+        });
+    
+        return unsubscribe;
+    }, [navigation]);
     
     if (isEditing) {
-        return EditMode(route.params.meditation, route.params.mode, setEditing, dispatch, {route, navigation});
+        return EditMode(newMeditation, route.params.mode, setEditing, dispatch, {route, navigation});
     } else {
-        return ReadMode(route.params.meditation, setEditing);
+        return ReadMode(newMeditation, navigation);
     }
 };
 
