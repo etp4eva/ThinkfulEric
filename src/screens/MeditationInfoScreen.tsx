@@ -410,8 +410,6 @@ const EditMode = (
     )
 }
 
-// TODO: Edit and save changes to meditation log also more fields
-// eg. Stress level, location
 export const MediationInfoScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'MeditationInfo'> ) => {
     const {state, dispatch} = useContext(DispatchContext);
 
