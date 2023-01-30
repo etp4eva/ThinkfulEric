@@ -1,6 +1,6 @@
 import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack';
 import { MeditationInfoMode, RootStackParamList } from './ScreenParams';
-import { Button, Text, View, StyleSheet, TextInput, ImageBackground } from 'react-native'
+import { Button, Text, View, StyleSheet, TextInput, ImageBackground, ScrollView, TouchableOpacity, TouchableHighlight } from 'react-native'
 import React, { useContext, useState } from 'react';
 import { DispatchContext } from '../contexts/Context';
 import { Meditation } from './LogScreen';
@@ -49,12 +49,12 @@ const ReadMode = (
 ) => {
     const minSec = calculateMinSec(meditation.timeElapsed);
 
-    let log;
-    let location;
+    let log: JSX.Element;
+    let location: JSX.Element;
     let stressBefore;
     let stressAfter;
     let depthCom;
-    let feelingsCombo;
+    let feelingsCombo: JSX.Element;
     let interrupted;
 
     if (meditation.location) {
@@ -173,9 +173,9 @@ const ReadMode = (
         </View>
     );
 
-    return (
-        <View style={ Theme.styles.container }>
-            <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>
+    const listHeader = () => {
+        return (
+            <View>
                 <View>
                     <Text style={styles.title}>
                         { generateMeditationTitle(meditation).dateTime }
@@ -186,40 +186,53 @@ const ReadMode = (
                 { log }
                 { feelingsCombo }
                 { interruptTimeCombo }
+
+                <Text style={ styles.sectionHeader }>Chimes</Text>
+            </View>            
+        )
+    }
+
+    const listFooter = () => {
+        return (
+            <ImageButton
+                imageStyle={ styles.imageButtonImageStyle }
+                textStyle={ styles.imageButtonTextStyle }
+                label='Edit log'
+                image={Theme.images.lotusButton}
+                onPress={() => { navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.EDIT }) }}
+            />
+        )
+    }
+
+    return (
+        <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>              
+            <FlatList
+                data={meditation.chimes}
+                renderItem={({item}) => {
+                    return (
+                        <View style={{ 
+                            flexDirection: 'row', 
+                            justifyContent: 'space-between',
+                            backgroundColor: Theme.colors.card,
+                            marginHorizontal: 10,
+                            paddingHorizontal: 5,
+                        }}>
+                            <Text style={ styles.dataItemText }>
+                                {item.labels[1]}
+                            </Text>
+                            <Text style={ styles.dataItemText }>
+                                {item.labels[0]}
+                            </Text>
+                        </View>
+                    )
+                }}
                 
-                <View>
-                    <Text style={ styles.sectionHeader }>Chimes</Text>
-                    <View style={ Theme.styles.card }>
-                        <FlatList
-                            data={meditation.chimes}
-                            renderItem={({item}) => {
-                                return (
-                                    <View style={{ 
-                                        flexDirection: 'row', 
-                                        justifyContent: 'space-between',
-                                    }}>
-                                        <Text style={ styles.dataItemText }>
-                                            {item.labels[1]}
-                                        </Text>
-                                        <Text style={ styles.dataItemText }>
-                                            {item.labels[0]}
-                                        </Text>
-                                    </View>
-                                )
-                            }}
-                        />
-                    </View>
-                </View>
-    
-                <ImageButton
-                    imageStyle={{ width: 100, height: undefined, aspectRatio: 1.8 }}
-                    textStyle={{ fontSize: 18 }}
-                    label='Edit log'
-                    image={Theme.images.lotusButton}
-                    onPress={() => { navigation.push('MeditationInfo', { meditation: meditation, mode: MeditationInfoMode.EDIT }) }}
-                />
-            </ImageBackground>
-        </View>
+                ListHeaderComponent={listHeader}
+                ListHeaderComponentStyle={{paddingBottom: 10}}
+                ListFooterComponent={listFooter}
+                ListFooterComponentStyle={{paddingTop: 10}}
+            />
+        </ImageBackground>        
     )
 }
 
@@ -227,17 +240,22 @@ type CustomSliderProps = {
     defaultValue: number;
     title: string;
     labels: string[];
+    icons?: string[][];
     numLevels: number;
     onUpdate: (value: number) => void;
 }
 
 const CustomSlider = (props: CustomSliderProps) => {
-    const [curLabel, setCurLabel] = useState(props.labels[props.defaultValue]);
+    const [curLabelIndex, setCurLabelIndex] = useState(props.defaultValue);
+
+    const curLabel = props.labels[curLabelIndex];
+    const curIcon = (props.icons) ? props.icons[curLabelIndex][1] : undefined;
+    const label = (curIcon) ? `${curLabel} ${curIcon}` : `${curLabel}`;
 
     return (
         <View>
-            <Text>{props.title}</Text>
-            <Text>{curLabel}</Text>
+            <Text style={ styles.sectionHeader }>{props.title}</Text> 
+            <View style={ Theme.styles.card }>
             <Slider 
                 value={props.defaultValue}
                 minimumValue={0}
@@ -245,11 +263,73 @@ const CustomSlider = (props: CustomSliderProps) => {
                 step={1}
                 onValueChange={(value) => {
                     props.onUpdate(value);
-                    setCurLabel(props.labels[value]);
+                    setCurLabelIndex(value);
                 }}
+                minimumTrackTintColor={Theme.colors.dot}
+                maximumTrackTintColor={Theme.colors.dot}                
+                thumbTintColor={Theme.colors.text}
             />
+            <Text style={{ textAlign:'center', fontSize: 15, }}>{ label }</Text>
+            </View>
         </View>
     )
+}
+
+type CustomTextInputProps = {
+    startHeight: number;
+    maxHeight?: number;
+    text: string;
+    onChangeText: (text: string) => void
+}
+
+const CustomTextInput = (props: CustomTextInputProps) => {
+    const [height, setHeight] = useState(props.startHeight);
+    const [showPencil, setShowPencil] = useState(true);
+
+    const refInput = React.useRef<TextInput>(null);
+
+    const pencil = (
+        <TouchableHighlight 
+            style={{marginTop: -15, position: 'absolute', right: 0, top: 10}}
+            onPress={() => {
+                if(refInput.current) refInput.current.focus();
+            }}
+        >
+            <Text>
+                ✏️
+            </Text>
+        </TouchableHighlight>
+    )
+
+    return (
+    <View>
+        <TextInput
+            multiline
+            ref={refInput}
+            onFocus={() => {
+                setShowPencil(false);
+            }}
+            onBlur={() => {
+                setShowPencil(true);
+            }}
+            onChangeText={(text) => {
+                props.onChangeText(text);
+            }}
+            onContentSizeChange={(e) => {
+                const newHeight = e.nativeEvent.contentSize.height;            
+                if (props.maxHeight) {
+                    setHeight((newHeight > props.maxHeight) ? props.maxHeight : newHeight);
+                } else {
+                    setHeight(newHeight);
+                }
+            }}
+            style={{height: height}}
+            textAlignVertical='top'
+        >
+            { props.text }
+        </TextInput>
+        { (showPencil) ? pencil : undefined }
+    </View>)
 }
 
 const EditMode = (
@@ -259,35 +339,38 @@ const EditMode = (
     dispatch: React.Dispatch<any>,
     {route, navigation}: StackScreenProps<RootStackParamList, 'MeditationInfo'>
 ) => {
-    let log = (
+    let location = (
         <View>
-            <Text>Log:</Text>
-            <TextInput
-                    multiline
-                    numberOfLines={10}
-                    onChangeText={(text) => {meditation.log = text}}
-                >
-                    {meditation.log}
-            </TextInput>
+            <Text style={ styles.sectionHeader }>Location</Text>
+            <View style={ Theme.styles.card }>
+                <CustomTextInput
+                    startHeight={14}
+                    onChangeText={(text) => {meditation.location = text}}
+                    text={(meditation.location) ? meditation.location : ''}
+                />
+            </View>
         </View>
     );
 
-    let location = (
+    let log = (
         <View>
-            <Text>Location:</Text>
-            <TextInput
-                onChangeText={(text) => {meditation.location = text}}
-            >
-                {meditation.location}
-            </TextInput>
+            <Text style={ styles.sectionHeader }>Log</Text>
+            <View style={ Theme.styles.card }>
+                <CustomTextInput
+                    startHeight={14}
+                    onChangeText={(text) => {meditation.log = text}}
+                    text={(meditation.log) ? meditation.log : ''}
+                />
+            </View>
         </View>
     );
 
     let stressBefore = (
         <CustomSlider 
             defaultValue={meditation.stressBefore ? meditation.stressBefore : 0} 
-            title={'Stress Before:'} 
+            title={'Stress Before'} 
             labels={stressLevels} 
+            icons={stress}
             numLevels={5}
             onUpdate={(value: number) => {
                 meditation.stressBefore = value === 0 ? undefined : value;
@@ -298,8 +381,9 @@ const EditMode = (
     let stressAfter = (
         <CustomSlider 
             defaultValue={meditation.stressAfter ? meditation.stressAfter : 0} 
-            title={'Stress After:'} 
+            title={'Stress After'} 
             labels={stressLevels}
+            icons={stress}
             numLevels={5}
             onUpdate={(value: number) => {
                 meditation.stressAfter = value === 0 ? undefined : value;
@@ -307,11 +391,12 @@ const EditMode = (
         />
     );
 
-    let depth = (
+    let depthSlider = (
         <CustomSlider 
             defaultValue={meditation.depth ? meditation.depth : 0} 
-            title={'Depth:'} 
+            title={'Depth'} 
             labels={depthLevels}
+            icons={depth}
             numLevels={4}
             onUpdate={(value: number) => {
                 meditation.depth = value === 0 ? undefined : value;
@@ -322,7 +407,7 @@ const EditMode = (
     let interrupted = (
         <CustomSlider 
             defaultValue={meditation.interrupted ? meditation.interrupted : 0} 
-            title={'Interrupted:'} 
+            title={'Interrupted'} 
             labels={interruptionLevels}
             numLevels={3}
             onUpdate={(value: number) => {
@@ -332,8 +417,11 @@ const EditMode = (
     )
 
     let startMeditationButton = (
-        <Button
-            title='Start Meditation'
+        <ImageButton
+            imageStyle={ styles.imageButtonImageStyle }
+            textStyle={ styles.imageButtonTextStyle }
+            label='Start Meditation'
+            image={Theme.images.lotusButton}
             onPress={() => {
                 dispatch(actionCreators.updateMeditation(meditation));
                 navigation.replace('Meditate', {meditation: meditation});
@@ -342,17 +430,23 @@ const EditMode = (
     )
 
     let cancelMeditationButton = (
-        <Button
-            title='Cancel Meditation'
+        <ImageButton
+            imageStyle={ styles.imageButtonImageStyle }
+            textStyle={ styles.imageButtonTextStyle }
+            label='Cancel Meditation'
+            image={Theme.images.lotusButton}
             onPress={() =>{
                 navigation.popToTop();
-            }}            
+            }}
         />
     )
 
     let saveChangesButton = (
-        <Button
-            title='Save changes'
+        <ImageButton
+            imageStyle={ styles.imageButtonImageStyle }
+            textStyle={ styles.imageButtonTextStyle }
+            label='Save Changes'
+            image={Theme.images.lotusButton}
             onPress={() => { 
                 dispatch(actionCreators.updateMeditation(meditation))
 
@@ -367,15 +461,21 @@ const EditMode = (
     )
 
     let discardChangesButton = (
-        <Button
-            title='Discard changes'
+        <ImageButton
+            imageStyle={ styles.imageButtonImageStyle }
+            textStyle={ styles.imageButtonTextStyle }
+            label='Discard Changes'
+            image={Theme.images.lotusButton}
             onPress={() => { navigation.pop(); }}
         />
     )
 
     let deleteMeditationButton = (
-        <Button
-            title='Delete meditation'
+        <ImageButton
+            imageStyle={ styles.imageButtonImageStyle }
+            textStyle={ styles.imageButtonTextStyle }
+            label='Delete Meditation'
+            image={Theme.images.lotusButton}
             onPress={() => { 
                 dispatch(actionCreators.deleteMeditation(meditation));
                 if (mode === MeditationInfoMode.POST_MED)
@@ -389,24 +489,30 @@ const EditMode = (
     )
 
     return (
-        <View>
-            <View>
-                <Text>{meditation.key}</Text>
-            </View>
-            {location}
-            {log}      
-            { (mode === MeditationInfoMode.PRE_MED  || MeditationInfoMode.LOG) ? stressBefore : null }
-            { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? stressAfter : null }
-            { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? depth : null }
-            { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? interrupted : null }
-            <View style={styles.sideBySide}>
-                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? saveChangesButton : null }
-                {  mode === MeditationInfoMode.LOG ? discardChangesButton : null }
-                {  mode === MeditationInfoMode.PRE_MED ? startMeditationButton : null }
-                {  mode === MeditationInfoMode.PRE_MED ? cancelMeditationButton : null }                
-                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? deleteMeditationButton : null }
-            </View>
-        </View>
+        <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>
+            <ScrollView contentContainerStyle={{flexGrow: 1}} >            
+                <View>
+                    <Text style={styles.title}>
+                        { generateMeditationTitle(meditation).dateTime }
+                    </Text>
+                </View>
+                
+                {location}
+                {log}      
+                { (mode === MeditationInfoMode.PRE_MED  || MeditationInfoMode.LOG) ? stressBefore : null }
+                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? stressAfter : null }
+                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? depthSlider : null }
+                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? interrupted : null }
+                {/* TODO: https://stackoverflow.com/a/50714355 */}
+                <View style={styles.sideBySide}>
+                    { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? saveChangesButton : null }
+                    {  mode === MeditationInfoMode.LOG ? discardChangesButton : null }
+                    {  mode === MeditationInfoMode.PRE_MED ? startMeditationButton : null }
+                    {  mode === MeditationInfoMode.PRE_MED ? cancelMeditationButton : null }                
+                    { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? deleteMeditationButton : null }
+                </View>            
+            </ScrollView>
+        </ImageBackground>
     )
 }
 
@@ -440,6 +546,8 @@ const styles = StyleSheet.create({
     sideBySide: {
         display: 'flex',
         flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-evenly',
     },
 
     title: {
@@ -486,5 +594,18 @@ const styles = StyleSheet.create({
 
     dataItemText: {
         fontSize: 20,
+    },
+
+    imageButtonImageStyle: {
+        width: 80, 
+        height: undefined, 
+        aspectRatio: 1.8 
+    },
+
+    imageButtonTextStyle: {
+        fontSize: 16,
+        textShadowColor: Theme.colors.primary,
+        //textShadowOffset: {width: -1, height: 1},
+        textShadowRadius: 10,
     }
 });

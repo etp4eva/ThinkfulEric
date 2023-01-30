@@ -15,6 +15,7 @@ export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackPara
     const {state, dispatch} = useContext(DispatchContext);
     const [chimePickerModalOpen, setChimePickerModalOpen] = useState<boolean>(false);
   
+    // TODO: Scroll view wrapping a la meditation info screen in case somebody adds too many chimes
     return (
       <View style={ Theme.styles.container }>
         <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>
