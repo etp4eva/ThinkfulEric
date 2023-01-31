@@ -429,18 +429,6 @@ const EditMode = (
         />
     )
 
-    let cancelMeditationButton = (
-        <ImageButton
-            imageStyle={ styles.imageButtonImageStyle }
-            textStyle={ styles.imageButtonTextStyle }
-            label='Cancel Meditation'
-            image={Theme.images.lotusButton}
-            onPress={() =>{
-                navigation.popToTop();
-            }}
-        />
-    )
-
     let saveChangesButton = (
         <ImageButton
             imageStyle={ styles.imageButtonImageStyle }
@@ -499,17 +487,16 @@ const EditMode = (
                 
                 {location}
                 {log}      
-                { (mode === MeditationInfoMode.PRE_MED  || MeditationInfoMode.LOG) ? stressBefore : null }
-                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? stressAfter : null }
-                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? depthSlider : null }
-                { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? interrupted : null }
+                { (mode === MeditationInfoMode.PRE_MED  || mode === MeditationInfoMode.LOG) ? stressBefore : null }
+                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? stressAfter : null }
+                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? depthSlider : null }
+                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? interrupted : null }
                 {/* TODO: https://stackoverflow.com/a/50714355 */}
                 <View style={styles.sideBySide}>
-                    { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? saveChangesButton : null }
+                    { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? saveChangesButton : null }
                     {  mode === MeditationInfoMode.LOG ? discardChangesButton : null }
-                    {  mode === MeditationInfoMode.PRE_MED ? startMeditationButton : null }
-                    {  mode === MeditationInfoMode.PRE_MED ? cancelMeditationButton : null }                
-                    { (mode === MeditationInfoMode.POST_MED || MeditationInfoMode.LOG) ? deleteMeditationButton : null }
+                    {  mode === MeditationInfoMode.PRE_MED ? startMeditationButton : null }             
+                    { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? deleteMeditationButton : null }
                 </View>            
             </ScrollView>
         </ImageBackground>

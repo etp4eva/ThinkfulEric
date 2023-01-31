@@ -148,8 +148,11 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
   }
   
   return (
-    <View style={ Theme.styles.container }>
-      <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>
+    <ImageBackground style={ Theme.styles.bg } source={ Theme.images.background }>
+      <View style={ {
+        backgroundColor: 'rgba(0,0,0,0.0)',
+        maxHeight: '45%'
+        } }>
 
         <Calendar     
           maxDate={ new Date().toUTCString() }
@@ -218,9 +221,8 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
         <View style={ Theme.styles.card }>
           {renderList()}
         </View>
-
-      </ImageBackground>
-    </View>
+      </View>
+    </ImageBackground>    
   )
 }
 
