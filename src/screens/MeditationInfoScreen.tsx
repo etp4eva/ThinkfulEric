@@ -60,7 +60,7 @@ const ReadMode = (
     if (meditation.location) {
         location = (
             <View>
-                <Text style={ styles.sectionHeader }>Location</Text>
+                <Text style={ Theme.styles.sectionHeader }>Location</Text>
                 <View style={ Theme.styles.card }>
                     <Text style={{fontSize: 15}}>
                         {meditation.location}
@@ -73,7 +73,7 @@ const ReadMode = (
     if (meditation.log) {
         log = (
             <View>
-                <Text style={ styles.sectionHeader }>Log</Text>
+                <Text style={ Theme.styles.sectionHeader }>Log</Text>
                 <View style={ Theme.styles.card }>
                     <Text style={{fontSize: 15}}>
                         { meditation.log }
@@ -86,7 +86,7 @@ const ReadMode = (
     if (meditation.stressBefore) {
         stressBefore = (
             <View style={ styles.rowItems }>
-                <Text style={ styles.centeredHeader }>Stress Before</Text>
+                <Text style={ Theme.styles.centeredHeader }>Stress Before</Text>
                 <View style={ styles.rowCard }>
                     <Text style={ styles.emojiScale }>
                         { stress[meditation.stressBefore][1] }
@@ -102,7 +102,7 @@ const ReadMode = (
     if (meditation.stressAfter) {
         stressAfter = (
             <View style={ styles.rowItems }>
-                <Text style={ styles.centeredHeader }>Stress After</Text>
+                <Text style={ Theme.styles.centeredHeader }>Stress After</Text>
                 <View style={ styles.rowCard }>
                     <Text style={ styles.emojiScale }>
                         { stress[meditation.stressAfter][1] }
@@ -118,7 +118,7 @@ const ReadMode = (
     if (meditation.depth) {
         depthCom = (
             <View style={ styles.rowItems }>
-                <Text style={ styles.centeredHeader }>Depth</Text>
+                <Text style={ Theme.styles.centeredHeader }>Depth</Text>
                 <View style={ styles.rowCard }>                    
                     <Text style={ styles.emojiScale }>
                         { depth[meditation.depth][1] }
@@ -134,7 +134,7 @@ const ReadMode = (
     if (meditation.interrupted) {
         interrupted = (
             <View style={ styles.rowItems }>
-                <Text style={ styles.centeredHeader }>Interrupted</Text>
+                <Text style={ Theme.styles.centeredHeader }>Interrupted</Text>
                 <View style={ styles.rowCard }>
                     <Text style={ styles.dataItemText }>
                         {interruptionLevels[meditation.interrupted]}
@@ -146,7 +146,7 @@ const ReadMode = (
 
     const timeElapsed = (
         <View style={ styles.rowItems }>            
-            <Text style={ styles.centeredHeader }>Time Elapsed</Text>
+            <Text style={ Theme.styles.centeredHeader }>Time Elapsed</Text>
             <View style={ styles.rowCard }>
                 <Text style={ styles.dataItemText }>
                     {minSec.minutes}m {minSec.seconds.toString().padStart(2,'0')}s
@@ -187,7 +187,7 @@ const ReadMode = (
                 { feelingsCombo }
                 { interruptTimeCombo }
 
-                <Text style={ styles.sectionHeader }>Chimes</Text>
+                <Text style={ Theme.styles.sectionHeader }>Chimes</Text>
             </View>            
         )
     }
@@ -254,7 +254,7 @@ const CustomSlider = (props: CustomSliderProps) => {
 
     return (
         <View>
-            <Text style={ styles.sectionHeader }>{props.title}</Text> 
+            <Text style={ Theme.styles.sectionHeader }>{props.title}</Text> 
             <View style={ Theme.styles.card }>
             <Slider 
                 value={props.defaultValue}
@@ -341,7 +341,7 @@ const EditMode = (
 ) => {
     let location = (
         <View>
-            <Text style={ styles.sectionHeader }>Location</Text>
+            <Text style={ Theme.styles.sectionHeader }>Location</Text>
             <View style={ Theme.styles.card }>
                 <CustomTextInput
                     startHeight={14}
@@ -354,7 +354,7 @@ const EditMode = (
 
     let log = (
         <View>
-            <Text style={ styles.sectionHeader }>Log</Text>
+            <Text style={ Theme.styles.sectionHeader }>Log</Text>
             <View style={ Theme.styles.card }>
                 <CustomTextInput
                     startHeight={14}
@@ -487,16 +487,16 @@ const EditMode = (
                 
                 {location}
                 {log}      
-                { (mode === MeditationInfoMode.PRE_MED  || mode === MeditationInfoMode.LOG) ? stressBefore : null }
-                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? stressAfter : null }
-                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? depthSlider : null }
-                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? interrupted : null }
+                { (mode === MeditationInfoMode.PRE_MED  || mode === MeditationInfoMode.EDIT) ? stressBefore : null }
+                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.EDIT) ? stressAfter : null }
+                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.EDIT) ? depthSlider : null }
+                { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.EDIT) ? interrupted : null }
                 {/* TODO: https://stackoverflow.com/a/50714355 */}
                 <View style={styles.sideBySide}>
-                    { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? saveChangesButton : null }
-                    {  mode === MeditationInfoMode.LOG ? discardChangesButton : null }
+                    { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.EDIT) ? saveChangesButton : null }
+                    {  mode === MeditationInfoMode.EDIT ? discardChangesButton : null }
                     {  mode === MeditationInfoMode.PRE_MED ? startMeditationButton : null }             
-                    { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.LOG) ? deleteMeditationButton : null }
+                    { (mode === MeditationInfoMode.POST_MED || mode === MeditationInfoMode.EDIT) ? deleteMeditationButton : null }
                 </View>            
             </ScrollView>
         </ImageBackground>
@@ -542,19 +542,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         paddingTop: 10,
-    },
-
-    sectionHeader: {
-        fontWeight: 'bold',
-        fontSize: 16,
-        paddingLeft: 10,
-        marginBottom: -10,
-    },
-
-    centeredHeader: {
-        fontWeight: 'bold',
-        fontSize: 16,
-        textAlign: 'center',
     },
 
     rowContainer: {

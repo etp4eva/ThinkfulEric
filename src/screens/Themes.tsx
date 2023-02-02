@@ -60,5 +60,16 @@ export const Theme = {
         //fontStyle: "italic", 
         marginTop: -20,
       },
+      sectionHeader: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        paddingLeft: 10,
+        marginBottom: -10,
+      },
+      centeredHeader: {
+          fontWeight: 'bold',
+          fontSize: 16,
+          textAlign: 'center',
+      },
     })
   }

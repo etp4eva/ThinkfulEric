@@ -10,12 +10,13 @@ type Params = {
     onPress: () => void,
     imageStyle?: StyleProp<ImageStyle>,
     textStyle?: StyleProp<TextStyle>,
+    disabled?: boolean,
 }
 
 export const ImageButton = (params: Params) => {
 
     const label = (params.label) ? (
-        <Text style={params.textStyle}>
+        <Text style={[params.textStyle, (params.disabled) ? styles.disabled : null]}>
             {params.label}
         </Text>
     ) : undefined
@@ -25,12 +26,13 @@ export const ImageButton = (params: Params) => {
             onPress={params.onPress}
             style={({pressed}) => [
                 (pressed) ? styles.pressed : null
-            ]}  
+            ]}
+            disabled={params.disabled}  
         >
             <View style={[styles.container]}>
                 <Image
                     source={params.image}
-                    style={params.imageStyle}
+                    style={[params.imageStyle, (params.disabled) ? styles.disabled : null]}
                 />
                 {label}
             </View>
@@ -45,4 +47,7 @@ const styles = StyleSheet.create({
     pressed: {
         backgroundColor: 'rgba(255,255,255,0.2)',
     },
+    disabled: {
+        opacity: 0.5,
+    }
 })

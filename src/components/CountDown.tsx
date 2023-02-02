@@ -1,7 +1,7 @@
 // https://dev.to/yuridevat/how-to-create-a-timer-with-react-7b9
 
 import { useEffect, useState } from "react";
-import { Text } from "react-native"
+import { StyleProp, Text, TextStyle } from "react-native"
 import { Timer } from "../types/Timer";
 
 export enum CountDownState {
@@ -14,6 +14,7 @@ type Props = {
     totalSeconds: number;
     state: CountDownState;
     onComplete?: () => void;
+    style?: StyleProp<TextStyle>
 };
 
 const generateDisplayString = (ms: number) => {
@@ -81,6 +82,6 @@ export const CountDown = (props: Props) => {
         }
     }, [timer])
 
-    return <Text>{timerDisplay}</Text>
+    return <Text style={props.style}>{timerDisplay}</Text>
 
 }
