@@ -9,12 +9,13 @@ import { createNewMeditation } from "../types/types";
 import { MeditationInfoMode, RootStackParamList } from "./ScreenParams";
 import { Theme } from './Themes';
 import { ImageButton } from "../components/ImageButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export const HomeScreen = ({ route, navigation }: StackScreenProps<RootStackParamList, 'Home'> ) => {
     const {state, dispatch} = useContext(DispatchContext);
     const [chimePickerModalOpen, setChimePickerModalOpen] = useState<boolean>(false);
-  
+
     // TODO: Scroll view wrapping a la meditation info screen in case somebody adds too many chimes
     return (
       <View style={ Theme.styles.container }>

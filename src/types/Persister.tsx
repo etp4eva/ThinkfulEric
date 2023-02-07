@@ -18,8 +18,10 @@ export class Persister {
             const monthKey = generateMonthKey(year, month);
             
             const mListJSON = await AsyncStorage.getItem(monthKey);
-            
-            return mListJSON != null ? JSON.parse(mListJSON) : null;
+
+            const parsed = mListJSON != null ? JSON.parse(mListJSON) : null;
+
+            return parsed;
         } catch (e) {
             // TODO: getMeditationMonth error
         }

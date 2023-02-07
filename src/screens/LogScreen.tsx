@@ -131,7 +131,8 @@ export const LogScreen = ({ route, navigation }: StackScreenProps<RootStackParam
           color={Theme.colors.dot}
         />
       )
-    } else if (filteredMeditationMap) {
+    } else if (filteredMeditationMap && Object.keys(filteredMeditationMap).length !== 0) {
+
       return (
         <FlatList 
           data={Object.keys(filteredMeditationMap)}

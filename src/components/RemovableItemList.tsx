@@ -25,7 +25,7 @@ export const RemoveableItemList = (params: Params) => {
                 <Pressable
                     onPress={() => params.removeFn(index)}
                 >
-                    <Text style={[params.textStyle]}>X</Text>
+                    <Text style={{fontSize:25}}>❌</Text>
                 </Pressable>
             )
         }

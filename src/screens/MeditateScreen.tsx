@@ -45,12 +45,14 @@ export const MeditateScreen = ({ route, navigation }: StackScreenProps<RootStack
             style={{fontSize: 40, textAlign: "center"}}
             onComplete={() => {
               if (nextChime.chimeSound) {
-                chimePlayer.playChime(nextChime.chimeSound);
+                chimePlayer.playChime(nextChime.chimeSound);                
               }
 
               if (chimeList.length > 1) {
                 setNextChime(chimeList[1]);
                 setNextChimeTime(chimeList[1].numMinutes);
+                
+                setTimerState(CountDownState.PAUSED);
                 setTimerState(CountDownState.RUNNING);
               }
 

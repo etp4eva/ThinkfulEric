@@ -134,7 +134,7 @@ const dummyMeditationsMap: MeditationMap = {
 };
 
 export const MeditationInitialState: State = {
-    meditations: dummyMeditationsMap,
+    meditations: {},//dummyMeditationsMap,
     chimes: [
         { labels: ['20 minutes', 'Waves'], numMinutes: 20 },
     ]
