@@ -18,16 +18,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.etp4eva.ThinkfulEric"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+	  "enableProguardInReleaseBuilds": true,
+      "package": "com.etp4eva.ThinkfulEric"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "637a0a6d-84df-48ba-8a18-952be208f452"
+      }
     }
   }
 }
