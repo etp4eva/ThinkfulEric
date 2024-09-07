@@ -2,7 +2,7 @@
   "expo": {
     "name": "ThinkfulEric",
     "slug": "ThinkfulEric",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,11 +22,12 @@
       "bundleIdentifier": "com.etp4eva.ThinkfulEric"
     },
     "android": {
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-	  "enableProguardInReleaseBuilds": true,
+      "enableProguardInReleaseBuilds": true,
       "package": "com.etp4eva.ThinkfulEric"
     },
     "web": {
@@ -36,6 +37,18 @@
       "eas": {
         "projectId": "637a0a6d-84df-48ba-8a18-952be208f452"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          }
+        }
+      ]
+    ]
   }
 }
